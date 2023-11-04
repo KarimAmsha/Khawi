@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "ic_logoutpdf.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
