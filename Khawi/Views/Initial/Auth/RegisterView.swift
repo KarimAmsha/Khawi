@@ -113,8 +113,8 @@ struct RegisterView: View {
 
 extension RegisterView {
     func login() {
-        authViewModel.login {
+        authViewModel.login(username: "", password: "", onsuccess: {
             moveToVerificationCodeView = true
-        }
+        })
     }
 }

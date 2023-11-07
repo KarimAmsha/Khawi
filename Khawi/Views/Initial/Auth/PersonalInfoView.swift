@@ -155,8 +155,10 @@ struct PersonalInfoView: View {
 
 extension PersonalInfoView {
     private func register() {
-        authViewModel.register {
+        authViewModel.login(username: "", password: "", onsuccess: {
+            print("sss")
+            settings.id = 1
             settings.loggedIn = true
-        }
+        })
     }
 }

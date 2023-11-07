@@ -100,7 +100,7 @@ struct SMSVerificationView_Previews: PreviewProvider {
 
 extension SMSVerificationView {
     private func verify() {
-        authViewModel.verify {
+        authViewModel.verify(code: code) {
             moveToPersonalInfoView = true
         }
     }

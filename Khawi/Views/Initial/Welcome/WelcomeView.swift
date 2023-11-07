@@ -16,6 +16,7 @@ struct WelcomeView: View {
         WelcomeItem(imageName: "slider3", titleKey: LocalizedStringKey.investYourCar, descriptionKey: LocalizedStringKey.descriptionKey)
     ]
     @EnvironmentObject var languageManager: LanguageManager
+    @ObservedObject var authViewModel: AuthViewModel
 
     var body: some View {
         NavigationStack {
@@ -54,6 +55,6 @@ struct WelcomeView: View {
 }
 
 #Preview {
-    WelcomeView()
+    WelcomeView(authViewModel: AuthViewModel())
         .environmentObject(LanguageManager())
 }
