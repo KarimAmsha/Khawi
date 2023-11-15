@@ -13,7 +13,7 @@ class Trip: NSObject, ObservableObject, Identifiable, MKAnnotation {
     let tripNumber: String?
     let imageURL: URL?
     let date: String?
-    let status: OrderType?
+    let status: OrderStatus?
     let fromDestination: String?
     let toDestination: String?
     let price: String?
@@ -21,7 +21,7 @@ class Trip: NSObject, ObservableObject, Identifiable, MKAnnotation {
     let coordinate: CLLocationCoordinate2D
     let type: RequestType?
 
-    init(tripNumber: String?, imageURL: URL?, date: String?, status: OrderType?, fromDestination: String?, toDestination: String?, price: String?, title: String?, coordinate: CLLocationCoordinate2D, type: RequestType?) {
+    init(tripNumber: String?, imageURL: URL?, date: String?, status: OrderStatus?, fromDestination: String?, toDestination: String?, price: String?, title: String?, coordinate: CLLocationCoordinate2D, type: RequestType?) {
         self.tripNumber = tripNumber
         self.imageURL = imageURL
         self.date = date

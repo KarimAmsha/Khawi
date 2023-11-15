@@ -9,8 +9,12 @@ import SwiftUI
 
 struct JoinRequestSuccessView: View {
     @StateObject private var router: MainRouter
-    
-    init(router: MainRouter) {
+    var message: String = ""
+    var orderID: String = ""
+
+    init(orderID: String, message: String, router: MainRouter) {
+        self.orderID = orderID
+        self.message = message
         _router = StateObject(wrappedValue: router)
     }
 
@@ -23,13 +27,13 @@ struct JoinRequestSuccessView: View {
                 .padding(23)
                 .background(Color.green0CB057().opacity(0.2).clipShape(Circle()))
             
-            Text(LocalizedStringKey.joinRequestSuccess)
+            Text(message)
                 .customFont(weight: .book, size: 18)
                 .foregroundColor(.grayA4ACAD())
             
             Button {
                 router.dismiss()
-                router.presentViewSpec(viewSpec: .driverJoinRequestDetails)
+                router.presentViewSpec(viewSpec: .joiningRequestOrderDetailsView(orderID))
             } label: {
                 Text(LocalizedStringKey.showRequestDetails)
             }
@@ -46,5 +50,5 @@ struct JoinRequestSuccessView: View {
 }
 
 #Preview {
-    JoinRequestSuccessView(router: MainRouter(isPresented: .constant(.main)))
+    JoinRequestSuccessView(orderID: "", message: "", router: MainRouter(isPresented: .constant(.main)))
 }

@@ -7,18 +7,11 @@
 
 import Foundation
 
-struct WelcomeItem {
-    let imageName: String
-    let titleKey: String
-    let descriptionKey: String
-
-    var title: String {
-        return titleKey.localized
-    }
-
-    var description: String {
-        return descriptionKey.localized
-    }
+struct WelcomeItem: Codable {
+    let _id: String?
+    let icon: String?
+    let Title: String?
+    let Description: String?
 }
 
 

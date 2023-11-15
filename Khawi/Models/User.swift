@@ -7,59 +7,114 @@
 
 import Foundation
 
-struct User: Codable, Hashable {
-    var id: Int?
-    var name: String?
-    var company_name: String?
-    var company_image: String?
-    var bio: String?
-    var email: String?
-    var mobile: String?
-    var image: String?
-    var city_name: String?
-    var city_id: Int?
-    var address: String?
-    var personal_id: String?
-    var nationality: String?
-    var license_number: String?
-    var license_image: String?
-    var bank_account: String?
-    var iban: String?
-    var type: Int?
-    var verified: Bool?
-    var enabled: Bool?
-    var access_token: String?
-    var dob: String?
-    var rate: Int?
-    var rate_count: Int?
+struct User: Codable {
+    let createAt: String?
+    let isVerify: Bool?
+    let isBlock: Bool?
+    let wallet: Int?
+    let _id: String?
+    let full_name: String?
+    let email: String?
+    let password: String?
+    let phone_number: String?
+    let os: String?
+    let lat: Double?
+    let lng: Double?
+    let fcmToken: String?
+    let verify_code: String?
+    let isEnableNotifications: Bool?
+    let token: String?
+    let image: String?
+    let address: String?
+    let carColor: String?
+    let carModel: String?
+    let carNumber: String?
+    let carType: String?
+    let hasCar: Bool?
+    let rate: Double?
+    let orders: Int?
+    let delivery_address: [DeliveryAddress]?
+        
+    init(fromDictionary dictionary: [String: Any]) {
+        createAt = dictionary["createAt"] as? String ?? ""
+        isVerify = dictionary["isVerify"] as? Bool ?? false
+        isBlock = dictionary["isBlock"] as? Bool ?? false
+        wallet = dictionary["wallet"] as? Int ?? 0
+        _id = dictionary["_id"] as? String ?? ""
+        full_name = dictionary["full_name"] as? String ?? ""
+        email = dictionary["email"] as? String ?? ""
+        password = dictionary["password"] as? String ?? ""
+        phone_number = dictionary["phone_number"] as? String ?? ""
+        os = dictionary["os"] as? String ?? ""
+        lat = dictionary["lat"] as? Double ?? 0.0
+        lng = dictionary["lng"] as? Double ?? 0.0
+        fcmToken = dictionary["fcmToken"] as? String ?? ""
+        verify_code = dictionary["verify_code"] as? String ?? ""
+        isEnableNotifications = dictionary["isEnableNotifications"] as? Bool ?? false
+        token = dictionary["token"] as? String ?? ""
+        image = dictionary["image"] as? String ?? ""
+        address = dictionary["address"] as? String ?? ""
+        carColor = dictionary["carColor"] as? String ?? ""
+        carModel = dictionary["carModel"] as? String ?? ""
+        carNumber = dictionary["carNumber"] as? String ?? ""
+        carType = dictionary["carType"] as? String ?? ""
+        hasCar = dictionary["hasCar"] as? Bool ?? false
+//        rate = dictionary["rate"] as? Double ?? 0.0
+        if let rateValue = dictionary["rate"] as? Double {
+            rate = rateValue
+        } else if let rateValue = dictionary["rate"] as? Int {
+            rate = Double(rateValue)
+        } else {
+            rate = nil
+        }
 
-    enum CodingKeys: String, CodingKey {
-        case id, name, company_name, company_image, bio, email, mobile, image, city_name, city_id, address, personal_id, nationality, license_number, bank_account, iban, type, verified, enabled, access_token, dob, rate, rate_count
+        orders = dictionary["orders"] as? Int ?? 0
+        delivery_address = dictionary["delivery_address"] as? [DeliveryAddress] ?? []
     }
+}
 
-    init(_ userData: [String: Any]) {
-        self.id = userData["id"] as? Int
-        self.name = userData["name"] as? String
-        self.company_name = userData["company_name"] as? String
-        self.company_image = userData["company_image"] as? String
-        self.bio = userData["bio"] as? String
-        self.email = userData["email"] as? String
-        self.mobile = userData["mobile"] as? String
-        self.image = userData["image"] as? String
-        self.city_name = userData["city_name"] as? String
-        self.city_id = userData["city_id"] as? Int
-        self.address = userData["address"] as? String
-        self.personal_id = userData["personal_id"] as? String
-        self.nationality = userData["nationality"] as? String
-        self.license_number = userData["license_number"] as? String
-        self.bank_account = userData["bank_account"] as? String
-        self.iban = userData["iban"] as? String
-        self.type = userData["type"] as? Int
-        self.verified = userData["verified"] as? Bool
-        self.enabled = userData["enabled"] as? Bool
-        self.access_token = userData["access_token"] as? String
-        self.dob = userData["dob"] as? String
-        self.rate = userData["rate"] as? Int
-        self.rate_count = userData["rate_count"] as? Int
+extension User: Equatable {
+    static func == (lhs: User, rhs: User) -> Bool {
+        // Define your equality criteria here.
+        return lhs._id == rhs._id
+        // You can choose any property for comparison depending on your needs.
+    }
+}
+
+extension User: Hashable {
+    func hash(into hasher: inout Hasher) {
+        // Combine hash values for all properties
+        hasher.combine(createAt)
+        hasher.combine(isVerify)
+        hasher.combine(isBlock)
+        hasher.combine(wallet)
+        hasher.combine(_id)
+        hasher.combine(full_name)
+        hasher.combine(email)
+        hasher.combine(password)
+        hasher.combine(phone_number)
+        hasher.combine(os)
+        hasher.combine(lat)
+        hasher.combine(lng)
+        hasher.combine(fcmToken)
+        hasher.combine(verify_code)
+        hasher.combine(isEnableNotifications)
+        hasher.combine(token)
+        hasher.combine(image)
+        hasher.combine(address)
+        hasher.combine(carColor)
+        hasher.combine(carModel)
+        hasher.combine(carNumber)
+        hasher.combine(carType)
+        hasher.combine(hasCar)
+        hasher.combine(rate)
+        hasher.combine(orders)
+
+        // If `delivery_address` is not nil, include its hash value
+        if let deliveryAddress = delivery_address {
+            for address in deliveryAddress {
+                hasher.combine(address)
+            }
+        }
     }
 }

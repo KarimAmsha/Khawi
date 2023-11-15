@@ -6,5 +6,6 @@ target 'Khawi' do
   use_frameworks!
 
   # Pods for Khawi
-
+#  pod 'PayTabsSDK', '~> 6.4.12'
 end
+

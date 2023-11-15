@@ -8,33 +8,33 @@
 import SwiftUI
 
 struct NotificationRowView: View {
-    let notification: Notification
+    let notification: NotificationItem
 
     var body: some View {
         VStack {
-            if (notification.isFromAdmin ?? false) {
-                HStack(alignment: .firstTextBaseline, spacing: 17) {
-                    Circle()
-                        .frame(width: 8, height: 8)
-                        .foregroundColor(.primary())
-                    VStack(alignment: .leading) {
-                        Text(notification.title ?? "")
-                            .customFont(weight: .book, size: 12)
-                            .foregroundColor(.grayA4ACAD())
-                        HStack {
-                            Text(notification.message ?? "")
-                                .customFont(weight: .book, size: 14)
-                                .foregroundColor(.black141F1F())
-                            Spacer()
-                            Text(notification.date ?? "")
-                                .customFont(weight: .book, size: 14)
-                                .foregroundColor(.grayA4ACAD())
-                        }
-                    }
-                }
-            } else {
+//            if (notification.isFromAdmin ?? false) {
+//                HStack(alignment: .firstTextBaseline, spacing: 17) {
+//                    Circle()
+//                        .frame(width: 8, height: 8)
+//                        .foregroundColor(.primary())
+//                    VStack(alignment: .leading) {
+//                        Text(notification.title ?? "")
+//                            .customFont(weight: .book, size: 12)
+//                            .foregroundColor(.grayA4ACAD())
+//                        HStack {
+//                            Text(notification.message ?? "")
+//                                .customFont(weight: .book, size: 14)
+//                                .foregroundColor(.black141F1F())
+//                            Spacer()
+//                            Text(notification.date ?? "")
+//                                .customFont(weight: .book, size: 14)
+//                                .foregroundColor(.grayA4ACAD())
+//                        }
+//                    }
+//                }
+//            } else {
                 HStack(spacing: 15) {
-                    Image(notification.requestType == .joiningRequest ? "ic_new_notification" : "ic_agree_notification")
+                    Image(notification.notificationType == .join ? "ic_new_notification" : "ic_agree_notification")
                         .resizable()
                         .frame(width: 94, height: 92)
                     
@@ -44,7 +44,7 @@ struct NotificationRowView: View {
                             .foregroundColor(.primary())
                         HStack {
                             HStack(spacing: 12) {
-                                Text("\(notification.name ?? ""), ")
+                                Text("\(notification.fromName ?? ""), ")
                                     .foregroundColor(.blue288599())
                                 +
                                 Text(notification.message ?? "")
@@ -52,7 +52,7 @@ struct NotificationRowView: View {
                             }
                             .customFont(weight: .book, size: 14)
                             Spacer()
-                            Text(notification.date ?? "")
+                            Text(notification.formattedDate ?? "")
                                 .customFont(weight: .book, size: 14)
                                 .foregroundColor(.grayA4ACAD())
                         }
@@ -65,7 +65,7 @@ struct NotificationRowView: View {
                         }
                     }
                 }
-            }
+//            }
             
             CustomDivider()
         }
@@ -76,5 +76,5 @@ struct NotificationRowView: View {
 }
 
 #Preview {
-    NotificationRowView(notification: Notification(name: "أحمد", date: "08.58", title: "هذا اشعار خاص بالإدارة", message: "يطلب الانضمام إلى رحلتك.", isFromAdmin: true, requestType: .joiningRequest))
+    NotificationRowView(notification: NotificationItem(id: nil, fromId: nil, userId: nil, title: nil, message: nil, dateTime: nil, type: nil, bodyParams: nil, isRead: nil, fromName: nil, toName: nil))
 }

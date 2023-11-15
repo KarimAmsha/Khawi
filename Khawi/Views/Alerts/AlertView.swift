@@ -8,17 +8,52 @@
 import SwiftUI
 
 struct AlertView: View {
-    @Binding var message: String
+    var alertModel: AlertModel
 
     var body: some View {
-        // Alert view
-        HStack(spacing: 8) {
-            Text(message)
-                .foregroundColor(.white)
-                .font(.system(size: 16))
+        VStack(alignment: .center, spacing: 24) {
+            HStack {
+                Image("ic_logo")
+                    .resizable()
+                    .frame(width: 50, height: 120)
+                    .aspectRatio(1.0, contentMode: .fit)
+                    .padding(16)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(alertModel.title)
+                            .customFont(weight: .bold, size: 15)
+                        Text(alertModel.message)
+                            .customFont(weight: .book, size: 14)
+                    }
+                    
+                    HStack(spacing: 50) {
+                        Button {
+                            withAnimation {
+                                alertModel.onOKAction()
+                            }
+                        } label: {
+                            Text(LocalizedStringKey.ok)
+                        }
+                        .buttonStyle(PrimaryButton(fontSize: 15, fontWeight: .book, background: .primary(), foreground: .white, height: 48, radius: 12))
+                        
+                        if !alertModel.hideCancelButton {
+                            Button {
+                                alertModel.onCancelAction()
+                            } label: {
+                                Text(LocalizedStringKey.cancel)
+                            }
+                            .buttonStyle(PrimaryButton(fontSize: 15, fontWeight: .book, background: .primary(), foreground: .white, height: 48, radius: 12))
+                        }
+                    }
+                }
+            }
         }
-        .padding(16)
-        .background(Color.primary().cornerRadius(12))
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 24)
+        .padding(.top, 24)
+        .padding(.bottom, 44)
+        .ignoresSafeArea()
+        .background(.white)
+        .cornerRadius(16, corners: [.topLeft, .topRight])
     }
 }

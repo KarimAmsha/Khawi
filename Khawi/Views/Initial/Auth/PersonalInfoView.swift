@@ -7,123 +7,146 @@
 
 import SwiftUI
 import PopupView
+import MapKit
 
 struct PersonalInfoView: View {
-    @StateObject var authViewModel = AuthViewModel()
-    @EnvironmentObject var settings: UserSettings
-    @StateObject var mediaPickeriewModel = MediaPickerViewModel()
+    @StateObject var mediaPickerViewModel = MediaPickerViewModel()
     @State private var name = ""
     @State private var email = ""
-    @State private var haveCar = false
+    @State private var hasCar = false
     @State private var carType = ""
     @State private var carModel = ""
     @State private var carColor = ""
     @State private var carNumber = ""
     @State private var isFloatingPickerPresented = false
+    @StateObject private var router: MainRouter
+    private let errorHandling = ErrorHandling()
+    @EnvironmentObject var settings: UserSettings
+    @StateObject private var viewModel = UserViewModel(errorHandling: ErrorHandling())
+    @State private var userLocation: CLLocationCoordinate2D? = nil
+    @State private var uploadProgress: Double = 0.0
+    private var isImageSelected: Bool {
+        mediaPickerViewModel.selectedImage != nil
+    }
+
+    init(router: MainRouter) {
+        self._router = StateObject(wrappedValue: router)
+    }
 
     var body: some View {
-        LoadingView(isShowing: $authViewModel.shouldAnimating) {
-            GeometryReader { geometry in
-                VStack(spacing: 0) {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        VStack(spacing: 20) {
-                            ZStack {
-                                if let img = mediaPickeriewModel.selectedImage {
-                                    Image(uiImage: img)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 120, height: 120)
-                                        .clipShape(Circle())
-                                } else {
-                                    // Placeholder image when no image is selected
-                                    Image(systemName: "photo.circle")
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 120, height: 120)
-                                        .foregroundColor(.gray)
-                                        .clipShape(Circle())
-                                        .font(Font.system(size: 20).weight(.light)) 
-                                }
-                                
-                                // Button with image at the bottom-right corner
-                                Button(action: {
-                                    isFloatingPickerPresented.toggle()
-                                }) {
-                                    Image("ic_camera")
-                                        .resizable()
-                                        .frame(width: 32, height: 32)
-                                        .foregroundColor(.white)
-                                }
-                                .background(Circle().fill(Color.primary()))
-                                .frame(width: 40, height: 40)
-                                .offset(x: -40, y: 40)
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 20) {
+                        ZStack {
+                            if let img = mediaPickerViewModel.selectedImage {
+                                Image(uiImage: img)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 120, height: 120)
+                                    .clipShape(Circle())
+                            } else {
+                                // Placeholder image when no image is selected
+                                Image(systemName: "photo.circle")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 120, height: 120)
+                                    .foregroundColor(.gray)
+                                    .clipShape(Circle())
+                                    .font(Font.system(size: 20).weight(.light))
                             }
                             
-                            VStack(spacing: 16) {
-                                CustomTextField(text: $name, placeholder: LocalizedStringKey.fullName, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
-                                CustomTextField(text: $email, placeholder: LocalizedStringKey.email, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
-                                    .keyboardType(.emailAddress)
+                            // Button with image at the bottom-right corner
+                            Button(action: {
+                                isFloatingPickerPresented.toggle()
+                            }) {
+                                Image("ic_camera")
+                                    .resizable()
+                                    .frame(width: 32, height: 32)
+                                    .foregroundColor(.white)
                             }
-                            .padding(.top, 12)
-                            
-                            Button {
-                                withAnimation {
-                                    haveCar.toggle()
-                                }
-                            } label: {
-                                HStack {
-                                    Image(systemName: haveCar ? "checkmark.square.fill" : "square")
-                                        .resizable()
-                                        .frame(width: 24, height: 24)
-                                        .foregroundColor(haveCar ? .primary() : .grayDDDFDF())
-                                    Text(LocalizedStringKey.areYouHaveCar)
-                                        .customFont(weight: .book, size: 16)
-                                        .foregroundColor(.black131313())
-                                    Spacer()
-                                }
-                            }
-                            
-                            if haveCar {
-                                VStack(spacing: 16) {
-                                    CustomTextField(text: $carType, placeholder: LocalizedStringKey.carType, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
-                                    CustomTextField(text: $carModel, placeholder: LocalizedStringKey.carModel, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
-                                    CustomTextField(text: $carColor, placeholder: LocalizedStringKey.carColor, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
-                                    CustomTextField(text: $carNumber, placeholder: LocalizedStringKey.carNumber, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
-                                }
-                            }
-
-                            Spacer()
-
-                            Button {
-                                register()
-                            } label: {
-                                Text(LocalizedStringKey.completeRegisteration)
-                            }
-                            .buttonStyle(PrimaryButton(fontSize: 18, fontWeight: .book, background: .primary(), foreground: .white, height: 48, radius: 12))
-                            
+                            .background(Circle().fill(Color.primary()))
+                            .frame(width: 40, height: 40)
+                            .offset(x: -40, y: 40)
+                            .disabled(viewModel.isLoading)
                         }
-                        .padding(24)
-                        .frame(maxWidth: .infinity)
-                        .frame(minHeight: geometry.size.height)
+                        
+                        VStack(spacing: 16) {
+                            CustomTextField(text: $name, placeholder: LocalizedStringKey.fullName, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
+                                .disabled(viewModel.isLoading)
+                            CustomTextField(text: $email, placeholder: LocalizedStringKey.email, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
+                                .keyboardType(.emailAddress)
+                                .disabled(viewModel.isLoading)
+                        }
+                        .padding(.top, 12)
+                        
+                        Button {
+                            withAnimation {
+                                hasCar.toggle()
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: hasCar ? "checkmark.square.fill" : "square")
+                                    .resizable()
+                                    .frame(width: 24, height: 24)
+                                    .foregroundColor(hasCar ? .primary() : .grayDDDFDF())
+                                Text(LocalizedStringKey.areYouHaveCar)
+                                    .customFont(weight: .book, size: 16)
+                                    .foregroundColor(.black131313())
+                                Spacer()
+                            }
+                        }
+                        .disabled(viewModel.isLoading)
+                        
+                        if hasCar {
+                            VStack(spacing: 16) {
+                                CustomTextField(text: $carType, placeholder: LocalizedStringKey.carType, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
+                                    .disabled(viewModel.isLoading)
+                                CustomTextField(text: $carModel, placeholder: LocalizedStringKey.carModel, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
+                                    .disabled(viewModel.isLoading)
+                                CustomTextField(text: $carColor, placeholder: LocalizedStringKey.carColor, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
+                                    .disabled(viewModel.isLoading)
+                                CustomTextField(text: $carNumber, placeholder: LocalizedStringKey.carNumber, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
+                                    .disabled(viewModel.isLoading)
+                            }
+                        }
+
+                        Spacer()
+
+                        Button {
+                            self.register()
+                        } label: {
+                            Text(LocalizedStringKey.completeRegisteration)
+                        }
+                        .buttonStyle(PrimaryButton(fontSize: 18, fontWeight: .book, background: .primary(), foreground: .white, height: 48, radius: 12))
+                        .disabled(viewModel.isLoading)
+
+                        if let uploadProgress = viewModel.uploadProgress {
+                            // Display the progress view only when upload is in progress
+                            LinearProgressView(LocalizedStringKey.loading, progress: uploadProgress, color: .primary())
+                        }
                     }
+                    .padding(24)
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: geometry.size.height)
                 }
             }
         }
         .navigationTitle(LocalizedStringKey.personalInformation)
         .dismissKeyboard()
-        .fullScreenCover(isPresented: $mediaPickeriewModel.isPresentingImagePicker, content: {
-            ImagePicker(sourceType: mediaPickeriewModel.sourceType, completionHandler: mediaPickeriewModel.didSelectImage)
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectImage)
         })
         .popup(isPresented: $isFloatingPickerPresented) {
             FloatingPickerView(
                 isPresented: $isFloatingPickerPresented,
                 onChoosePhoto: {
                     // Handle choosing a photo here
-                    mediaPickeriewModel.choosePhoto()
+                    mediaPickerViewModel.choosePhoto()
                 },
                 onTakePhoto: {
                     // Handle taking a photo here
-                    mediaPickeriewModel.takePhoto()
+                    mediaPickerViewModel.takePhoto()
                 }
             )
         } customize: {
@@ -135,30 +158,57 @@ struct PersonalInfoView: View {
                 .closeOnTap(false)
                 .backgroundColor(.black.opacity(0.5))
         }
-        .popup(isPresented: $authViewModel.showErrorPopup) {
-            ErrorToastView(title: $authViewModel.errorTitle, message: $authViewModel.errorMessage)
-        } customize: {
-            $0
-                .type(.toast)
-                .position(.bottom)
-                .animation(.spring())
-                .closeOnTapOutside(true)
-                .autohideIn(2)
-                .backgroundColor(.black.opacity(0.63))
+        .onAppear {
+            // Use the user's current location if available
+            if let userLocation = LocationManager.shared.userLocation {
+                self.userLocation = userLocation
+            }
+        }
+        .onChange(of: viewModel.errorMessage) { errorMessage in
+            if let errorMessage = errorMessage {
+                router.presentToastPopup(view: .error("", errorMessage))
+            }
         }
     }
 }
 
 #Preview {
-    PersonalInfoView()
+    PersonalInfoView(router: MainRouter(isPresented: .constant(.personalInfo)))
+        .environmentObject(UserSettings())
 }
 
 extension PersonalInfoView {
+    
     private func register() {
-        authViewModel.login(username: "", password: "", onsuccess: {
-            print("sss")
-            settings.id = 1
+        var imageData: Data? = nil
+        var additionalParams: [String: Any] = [:]
+
+        if isImageSelected, let uiImage = mediaPickerViewModel.selectedImage {
+            // Convert the UIImage to Data, if needed
+            imageData = uiImage.jpegData(compressionQuality: 0.8)
+        }
+        
+        additionalParams = [
+            "email": email,
+            "full_name": name,
+            "lat": userLocation?.latitude ?? 0.0,
+            "lng": userLocation?.longitude ?? 0.0,
+            "hasCar": hasCar,
+            "carType": carType,
+            "carModel": carModel,
+            "carColor": carColor,
+            "carNumber": carNumber
+        ]
+        
+        if let userLocation = userLocation {
+            Utilities.getAddress(for: userLocation) { address in
+                additionalParams["address"] = address
+            }
+        }
+
+        viewModel.updateUserDataWithImage(imageData: imageData, additionalParams: additionalParams) {
+            router.replaceNavigationStack(path: [])
             settings.loggedIn = true
-        })
+        }
     }
 }

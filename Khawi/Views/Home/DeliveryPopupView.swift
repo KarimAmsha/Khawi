@@ -10,12 +10,12 @@ import MapKit
 
 struct DeliveryPopupView: View {
     @StateObject var settings: UserSettings
-    let item: Trip
+    let item: Order
     @StateObject private var router: MainRouter
     
-    init(settings: UserSettings, trip: Trip, router: MainRouter) {
+    init(settings: UserSettings, order: Order, router: MainRouter) {
         _settings = StateObject(wrappedValue: settings)
-        item = trip
+        item = order
         _router = StateObject(wrappedValue: router)
     }
 
@@ -24,7 +24,7 @@ struct DeliveryPopupView: View {
             VStack(alignment: .leading) {
                 HStack {
                     VStack {
-                        AsyncImage(url: settings.myUser.image?.toURL()) { phase in
+                        AsyncImage(url: item.user?.image?.toURL()) { phase in
                             switch phase {
                             case .empty:
                                 ProgressView() // Placeholder while loading
@@ -51,7 +51,7 @@ struct DeliveryPopupView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 0) {
-                        Text(settings.myUser.name ?? "")
+                        Text(item.user?.full_name ?? "")
                             .customFont(weight: .book, size: 20)
                             .foregroundColor(.black141F1F())
                         Text(item.type?.value ?? "")
@@ -63,7 +63,7 @@ struct DeliveryPopupView: View {
                     
                     Button {
                         router.dismiss() 
-                        router.presentViewSpec(viewSpec: .deliveryRequestOrderDetailsView)
+                        router.presentViewSpec(viewSpec: .deliveryRequestOrderDetailsView(item.id ?? ""))
                     } label: {
                         Text(LocalizedStringKey.showDetails)
                             .customFont(weight: .book, size: 12)
@@ -76,13 +76,13 @@ struct DeliveryPopupView: View {
                         HStack(spacing: 4) {
                             Text(":\(LocalizedStringKey.from)")
                                 .foregroundColor(.black141F1F())
-                            Text(item.fromDestination ?? "")
+                            Text(item.f_address ?? "")
                                 .foregroundColor(.blue288599())
                         }
                         HStack(spacing: 4) {
                             Text(":\(LocalizedStringKey.to)")
                                 .foregroundColor(.black141F1F())
-                            Text(item.toDestination ?? "")
+                            Text(item.t_address ?? "")
                                 .foregroundColor(.blue288599())
                         }
                     }
@@ -93,7 +93,7 @@ struct DeliveryPopupView: View {
                             Text(LocalizedStringKey.tripDate)
                                 .customFont(weight: .book, size: 11)
                                 .foregroundColor(.grayA4ACAD())
-                            Text("07:30 صباحاً")
+                            Text(item.dt_time ?? "")
                                 .customFont(weight: .book, size: 14)
                                 .foregroundColor(.black141F1F())
                         }
@@ -110,7 +110,7 @@ struct DeliveryPopupView: View {
                             Text(LocalizedStringKey.dateOfTheFirstTrip)
                                 .customFont(weight: .book, size: 11)
                                 .foregroundColor(.grayA4ACAD())
-                            Text("15 ربيع الأول، 1445")
+                            Text(item.formattedDate ?? "")
                                 .customFont(weight: .book, size: 14)
                                 .foregroundColor(.black141F1F())
                         }
@@ -136,16 +136,5 @@ struct DeliveryPopupView: View {
 }
 
 #Preview {
-    DeliveryPopupView(settings: UserSettings(), trip: Trip(
-        tripNumber: "#12549",
-        imageURL: URL(string: "https://hips.hearstapps.com/hmg-prod/images/2022-gr86-premium-trackbred-002-1628887849.jpg?crop=0.689xw:0.517xh;0.242xw,0.238xh&resize=1200:*")!,
-        date: "2023-11-10",
-        status: .canceled,
-        fromDestination: "الدمام",
-        toDestination: "جدة",
-        price: "40 ر.س",
-        title: "الرحلة 9",
-        coordinate: CLLocationCoordinate2D(latitude: 24.7976, longitude: 46.6873),
-        type: .deliveryRequest
-    ), router: MainRouter(isPresented: .constant(.main)))
+    DeliveryPopupView(settings: UserSettings(), order: Order(id: nil, loc: nil, days: nil, passengers: nil, title: nil, f_lat: nil, f_lng: nil, t_lat: nil, t_lng: nil, max_price: nil, min_price: nil, price: nil, f_address: nil, t_address: nil, order_no: nil, tax: nil, totalDiscount: nil, netTotal: nil, status: nil, createAt: nil, dt_date: nil, dt_time: nil, is_repeated: nil, couponCode: nil, paymentType: nil, orderType: nil, max_passenger: nil, offers: nil, user: nil, notes: nil, canceled_note: nil), router: MainRouter(isPresented: .constant(.main)))
 }

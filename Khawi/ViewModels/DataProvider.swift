@@ -6,3 +6,102 @@
 //
 
 import Foundation
+import Alamofire
+import Combine
+
+class DataProvider {
+    static let shared = DataProvider()
+    
+    private let apiClient = APIClient.shared
+    
+    enum Endpoint {
+        case getWelcome
+        case getConstants
+        case getConstantDetails(_id: String)
+        case register(params: [String: Any])
+        case verify(params: [String: Any])
+        case resend(params: [String: Any])
+        case updateUserDataWithImage(params: [String: Any], imageData: Data?, token: String)
+        case getUserProfile(token: String)
+        case logout(userID: String, token: String)
+        case addOrder(params: [String: Any], token: String)
+        case addOfferToOrder(orderId: String, params: [String: Any], token: String)
+        case updateOfferStatus(orderId: String, params: [String: Any], token: String)
+        case updateOrderStatus(orderId: String, params: [String: Any], token: String)
+        case map(params: [String: Any], token: String)
+        case getOrders(status: String?, page: Int?, limit: Int?, token: String)
+        case getOrderDetails(orderId: String, token: String)
+        case addReview(orderID: String, params: [String: Any], token: String)
+        case getNotifications(page: Int?, limit: Int?, token: String)
+        case deleteNotification(id: String, token: String)
+        case getWallet(page: Int?, limit: Int?, token: String)
+        case addBalanceToWallet(params: [String: Any], token: String)
+        case addComplain(params: [String: Any], token: String)
+
+        // Map your custom Endpoint to APIEndpoint
+        func toAPIEndpoint() -> APIEndpoint {
+            switch self {
+            case .getWelcome:
+                return .getWelcome
+            case .getConstants:
+                return .getConstants
+            case .getConstantDetails( let _id):
+                return .getConstantDetails(_id: _id)
+            case .register(let params):
+                return .register(params: params)
+            case .verify(let params):
+                return .verify(params: params)
+            case .resend(let params):
+                return .resend(params: params)
+            case .updateUserDataWithImage(let params, let imageData, let token):
+                return .updateUserDataWithImage(params: params, imageData: imageData, token: token)
+            case .getUserProfile(let token):
+                return .getUserProfile(token: token)
+            case .logout(let userID, let token):
+                return .logout(userID: userID, token: token)
+            case .addOrder(let params, let token):
+                return .addOrder(params: params, token: token)
+            case .map(let params, let token):
+                return .map(params: params, token: token)
+            case .addOfferToOrder(let orderId, let params, let token):
+                return .addOfferToOrder(orderId: orderId, params: params, token: token)
+            case .updateOfferStatus(let orderId, let params, let token):
+                return .updateOfferStatus(orderId: orderId, params: params, token: token)
+            case .updateOrderStatus(let orderId, let params, let token):
+                return .updateOrderStatus(orderId: orderId, params: params, token: token)
+            case .getOrders(let status, let page, let limit, let token):
+                return .getOrders(status: status, page: page, limit: limit, token: token)
+            case .getOrderDetails(let orderId, let token):
+                return .getOrderDetails(orderId: orderId, token: token)
+            case .addReview(let orderID, let params, let token):
+                return .addReview(orderID: orderID, params: params, token: token)
+            case .getNotifications(let page, let limit, let token):
+                return .getNotifications(page: page, limit: limit, token: token)
+            case .deleteNotification(let id, let token):
+                return .deleteNotification(id: id, token: token)
+            case .getWallet(let page, let limit, let token):
+                return .getWallet(page: page, limit: limit, token: token)
+            case .addBalanceToWallet(let params, let token):
+                return .addBalanceToWallet(params: params, token: token)
+            case .addComplain(let params, let token):
+                return .addComplain(params: params, token: token)
+            }
+        }
+    }
+    
+    // Use a Combine Publisher for API calls
+    func request<T: Decodable>(endpoint: Endpoint, responseType: T.Type) -> AnyPublisher<T, APIClient.APIError> {
+        let apiEndpoint = endpoint.toAPIEndpoint()
+        return apiClient.requestPublisher(endpoint: apiEndpoint)
+    }
+    
+//    func requestMultipart<T: Decodable>(endpoint: Endpoint, imageFiles: [(Data, String)]?, responseType: T.Type) -> AnyPublisher<T, APIClient.APIError> {
+//        let apiEndpoint = endpoint.toAPIEndpoint()
+//        return apiClient.requestMultipartPublisher(endpoint: apiEndpoint, imageFiles: imageFiles)
+//    }
+    
+    func requestMultipart<T: Decodable>(endpoint: Endpoint, imageFiles: [(Data, String)]?, responseType: T.Type) -> AnyPublisher<(T, Double), APIClient.APIError> {
+        let apiEndpoint = endpoint.toAPIEndpoint()
+        return apiClient.requestMultipartPublisherWithProgress(endpoint: apiEndpoint, imageFiles: imageFiles)
+    }
+}

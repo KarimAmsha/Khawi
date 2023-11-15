@@ -7,106 +7,83 @@
 
 import SwiftUI
 import Combine
+import Foundation
 
 class UserSettings: ObservableObject {
-
-    @Published var id: Int {
-        didSet {
-            UserDefaults.standard.set(id, forKey: Keys.id)
-        }
-    }
+    static let shared = UserSettings()
     
-    @Published var access_token: String {
-        didSet {
-            UserDefaults.standard.set(access_token, forKey: Keys.access_token)
-        }
-    }
-
-    @Published var password: String {
-        didSet {
-            UserDefaults.standard.set(password, forKey: Keys.password)
-        }
-    }
+    @Published var user: User?
+    @Published var id: String?
+    @Published var token: String?
     
-    @Published var loggedIn : Bool!
-    @Published var myUser : User!
-    @Published var newUserData: [String: Any] = [:]
-    @Published var myInfo: [String: Any] =
-    UserDefaults.standard.dictionary(forKey: Keys.myInfo) ?? [:] {
+    @Published var loggedIn: Bool {
         didSet {
-            UserDefaults.standard.set(self.myInfo, forKey: Keys.myInfo)
-        }
-    }
-
-    @Published var name: String =
-    UserDefaults.standard.object(forKey: Keys.name)  as? String ?? "" {
-        didSet {
-            UserDefaults.standard.set(self.name, forKey: Keys.name)
-        }
-    }
-    
-    @Published var url: String =
-    UserDefaults.standard.object(forKey: Keys.url)  as? String ?? "" {
-        didSet {
-            UserDefaults.standard.set(self.url, forKey: Keys.url)
-        }
-    }
-    @Published var userType : UserType = .client
-
-    init() {
-        _id = .init(initialValue: UserDefaults.standard.object(forKey: Keys.id) as? Int ?? 0)
-        _access_token = .init(initialValue: UserDefaults.standard.object(forKey: Keys.access_token) as? String ?? "")
-        _password = .init(initialValue: UserDefaults.standard.object(forKey: Keys.password) as? String ?? "")
-        loggedIn = id != 0 ? true : false
-        _myInfo = .init(initialValue: UserDefaults.standard.object(forKey: Keys.myInfo) as? [String: Any] ?? [:])
-        myUser = User(myInfo)
-        userType = myUser.type == 1 ? UserType.client : UserType.driver
-    }
-        
-    func login() {
-        // login request... on success:
-        self.loggedIn = true
-    }
-
-    func logout() {
-        // login request... on success:
-        self.loggedIn = false
-    }
-
-    private struct Keys {
-//        static let id = "id"
-        static let id = "id"
-        static let password = "password"
-        static let myInfo = "myInfo"
-        static let access_token = "access_token"
-        static let name = "name"
-        static let url = "url"
-    }
-    
-    func store(dictionary: [String: String], key: String) {
-        var data: Data?
-        let encoder = JSONEncoder()
-        do {
-            data = try encoder.encode(dictionary)
-        } catch {
-            print("failed to get data")
-        }
-        UserDefaults.standard.set(data, forKey: key)
-    }
-
-    func fetchDictionay(key: String) -> [String: String]? {
-        let decoder = JSONDecoder()
-        do {
-            
-            if let storedData = UserDefaults.standard.data(forKey: key) {
-                let newArray = try decoder.decode([String: String].self, from: storedData)
-                print("new array: \(newArray)")
-                return newArray
+            if !loggedIn {
+                user = nil
+                id = nil
+                token = nil
+                clearUserStorage()
             }
-        } catch {
-            print("couldn't decode array: \(error)")
+        }
+    }
+    
+    init() {
+        // Initialize properties first
+        user = nil
+        id = nil
+        token = nil
+        loggedIn = false
+        
+        // Now you can call methods
+        if let storedUser = loadUserFromStorage() {
+            user = storedUser.user
+            id = storedUser.id
+            token = storedUser.token
+            loggedIn = true
+        }
+    }
+    
+    func login(user: User, id: String, token: String) {
+        self.user = user
+        self.id = id
+        self.token = token
+        loggedIn = true
+        saveUserToStorage(user: user, id: id, token: token)
+    }
+    
+    func logout() {
+        loggedIn = false
+    }
+    
+    private func loadUserFromStorage() -> (user: User, id: String, token: String)? {
+        if let userData = UserDefaults.standard.data(forKey: Keys.userData),
+           let decodedUser = try? JSONDecoder().decode(User.self, from: userData),
+           let storedId = UserDefaults.standard.string(forKey:  Keys.id),
+           let storedToken = UserDefaults.standard.string(forKey:  Keys.token) {
+            return (user: decodedUser, id: storedId, token: storedToken)
         }
         return nil
     }
+    
+    private func saveUserToStorage(user: User, id: String, token: String) {
+        if let encodedData = try? JSONEncoder().encode(user) {
+            UserDefaults.standard.set(encodedData, forKey: Keys.userData)
+            UserDefaults.standard.set(id, forKey: Keys.id)
+            UserDefaults.standard.set(token, forKey:  Keys.token)
+        }
+    }
+    
+    private func clearUserStorage() {
+        UserDefaults.standard.removeObject(forKey: Keys.userData)
+        UserDefaults.standard.removeObject(forKey:  Keys.id)
+        UserDefaults.standard.removeObject(forKey:  Keys.token)
+    }
+}
 
+extension UserSettings {
+    private struct Keys {
+        static let id = "id"
+        static let userData = "userData"
+        static let token = "token"
+    }
 }

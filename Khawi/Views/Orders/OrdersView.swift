@@ -9,25 +9,30 @@ import SwiftUI
 import MapKit
 
 struct OrdersView: View {
-    @State private var selectedTab = 0
-    @StateObject var tripsViewModel = TripsViewModel()
-    
-    let tabs = [LocalizedStringKey.currentOrders, LocalizedStringKey.completedOrders, LocalizedStringKey.cancelledOrders]
+    @State private var selectedTab: OrderStatus = .new
+    @StateObject private var router: MainRouter
+    @StateObject private var ordersViewModel = OrdersViewModel(initialRegion: MKCoordinateRegion(), errorHandling: ErrorHandling())
+    private let errorHandling = ErrorHandling()
+    let tabs = [OrderStatus.new, OrderStatus.finished, OrderStatus.canceled]
+
+    init(router: MainRouter) {
+        _router = StateObject(wrappedValue: router)
+    }
 
     var body: some View {
         VStack {
             // Segmented Control (Top Tabs)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 20) {
-                    ForEach(0..<tabs.count, id: \.self) { index in
+                    ForEach(tabs, id: \.self) { tab in
                         Button(action: {
                             withAnimation {
-                                selectedTab = index
+                                selectedTab = tab
                             }
                         }) {
-                            Text(tabs[index])
-                                .customFont(weight: index == selectedTab ? .bold : .book, size: 14)
-                                .foregroundColor(index == selectedTab ? .black141F1F() : .grayA4ACAD())
+                            Text(tab.value)
+                                .customFont(weight: tab == selectedTab ? .bold : .book, size: 14)
+                                .foregroundColor(tab == selectedTab ? .black141F1F() : .grayA4ACAD())
                         }
                     }
                 }
@@ -42,15 +47,39 @@ struct OrdersView: View {
                 GeometryReader { geometry in
                     Capsule()
                         .frame(width: geometry.size.width / CGFloat(tabs.count), height: 2)
-                        .offset(x: geometry.size.width / CGFloat(tabs.count) * CGFloat(selectedTab))
+                        .offset(x: (geometry.size.width / CGFloat(tabs.count) * CGFloat(tabs.firstIndex(of: selectedTab) ?? 0)) + (geometry.size.width / CGFloat(tabs.count) / 6) - 20)
                         .foregroundColor(.primary())
                 }
                 .frame(height: 2)
             }
             .padding(.top, 12)
 
-            TripsListView(trips: tripsViewModel.filteredTrips)
-            
+            ScrollView(showsIndicators: false) {
+                ForEach(ordersViewModel.orders, id: \.self) { item in
+                    OrderCardView(item: item)
+                        .onTapGesture {
+                            if item.type == .joining {
+                                router.presentViewSpec(viewSpec: .joiningRequestOrderDetailsView(item._id ?? ""))
+                            } else {
+                                router.presentViewSpec(viewSpec: .deliveryRequestOrderDetailsView(item._id ?? ""))
+                            }
+                        }
+                }
+                
+                if ordersViewModel.shouldLoadMoreData {
+                    Color.clear.onAppear {
+                        loadMore()
+                    }
+                }
+
+                if ordersViewModel.isFetchingMoreData {
+                    LoadingView()
+                }
+            }
+            .onAppear {
+                
+            }
+
             Spacer()
         }
         .toolbar {
@@ -63,30 +92,30 @@ struct OrdersView: View {
             }
         }
         .onAppear {
-            // Initialize filteredTrips with the trips matching the default tab (Current Orders)
-            filterTripsBySelectedTab(selectedTab)
+            loadData()
         }
         .onChange(of: selectedTab) { newTab in
-            // Update filteredTrips when selectedTab changes
-            filterTripsBySelectedTab(newTab)
+            loadData()
         }
-    }
-    
-    // Helper function to filter trips based on the selected tab
-    private func filterTripsBySelectedTab(_ tab: Int) {
-        switch tab {
-        case 0: // Current Orders
-            tripsViewModel.filteredTrips = tripsViewModel.allTrips.filter { $0.status == .opened }
-        case 1: // Completed Orders
-            tripsViewModel.filteredTrips = tripsViewModel.allTrips.filter { $0.status == .completed }
-        case 2: // Cancelled Orders
-            tripsViewModel.filteredTrips = tripsViewModel.allTrips.filter { $0.status == .canceled }
-        default:
-            tripsViewModel.filteredTrips = []
+        .onChange(of: ordersViewModel.errorMessage) { errorMessage in
+            if let errorMessage = errorMessage {
+                router.presentToastPopup(view: .error(LocalizedStringKey.error, errorMessage))
+            }
         }
     }
 }
 
 #Preview {
-    OrdersView()
+    OrdersView(router: MainRouter(isPresented: .constant(.main)))
+}
+
+extension OrdersView {
+    func loadData() {
+        ordersViewModel.orders.removeAll()
+        ordersViewModel.getOrders(status: selectedTab.rawValue, page: 0, limit: 10)
+    }
+    
+    func loadMore() {
+        ordersViewModel.loadMoreOrders(status: selectedTab.rawValue, limit: 10)
+    }
 }

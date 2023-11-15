@@ -10,7 +10,8 @@ import SwiftUI
 struct WalletView: View {
     @StateObject var settings: UserSettings
     @StateObject private var router: MainRouter
-    @State private var isButtonScaled = false
+    @StateObject private var viewModel = PaymentState(errorHandling: ErrorHandling())
+    @State private var showAddBalanceView = false
 
     init(settings: UserSettings, router: MainRouter) {
         _settings = StateObject(wrappedValue: settings)
@@ -33,15 +34,17 @@ struct WalletView: View {
                                 Text(LocalizedStringKey.myWallet)
                                     .customFont(weight: .bold, size: 18)
                                   .foregroundColor(Color.black141F1F())
-                                Spacer()
                                 HStack {
                                     VStack(alignment: .leading, spacing: 8) {
                                         Text(LocalizedStringKey.lastTransaction)
                                             .customFont(weight: .book, size: 14)
                                           .foregroundColor(Color.black141F1F())
-                                        Text("14 ربيع الأول، ١٤٤٥ هـ")
-                                            .customFont(weight: .book, size: 14)
-                                          .foregroundColor(Color.black141F1F())
+                                        if let lastDate = viewModel.walletResponse?.last_date {
+                                            let formattedDate = lastDate.formattedDateString(with: "yyyy-MM-dd")
+                                            Text(formattedDate ?? "Invalid date")
+                                                .customFont(weight: .book, size: 14)
+                                              .foregroundColor(Color.black141F1F())
+                                        }
                                     }
                                     Spacer()
                                     HStack {
@@ -49,7 +52,7 @@ struct WalletView: View {
                                             Text(LocalizedStringKey.totalAccount)
                                                 .customFont(weight: .book, size: 14)
                                                 .foregroundColor(Color.black141F1F())
-                                            Text("\(LocalizedStringKey.sar) 1520.5")
+                                            Text("\(LocalizedStringKey.sar) \(viewModel.walletResponse?.total?.toString() ?? "")")
                                                 .customFont(weight: .bold, size: 16)
                                                 .foregroundColor(Color.black141F1F())
                                         }
@@ -63,8 +66,22 @@ struct WalletView: View {
                             .customFont(weight: .bold, size: 14)
                           .foregroundColor(Color.black141F1F())
                         
-                        TransactionListView()
-                        
+                        ScrollView(showsIndicators: false) {
+                            ForEach(viewModel.walletDataItems, id: \.self) { item in
+                                TransactionsRowiew(item: item)
+                            }
+                            
+                            if viewModel.shouldLoadMoreData {
+                                Color.clear.onAppear {
+                                    loadMore()
+                                }
+                            }
+
+                            if viewModel.isFetchingMoreData {
+                                LoadingView()
+                            }
+                        }
+
                         Spacer()
                     }
                     .frame(minWidth: geometry.size.width)
@@ -75,7 +92,7 @@ struct WalletView: View {
             HStack {
                 Button(action: {
                     withAnimation {
-                        isButtonScaled.toggle()
+                        showAddBalanceView.toggle()
                     }
                 }) {
                     VStack(spacing: 5) {
@@ -92,7 +109,7 @@ struct WalletView: View {
                 .frame(width: 68, height: 68)
                 .background(Color.primary())
                 .clipShape(Circle())
-                .scaleEffect(isButtonScaled ? 1.2 : 1.0)
+                .scaleEffect(showAddBalanceView ? 1.2 : 1.0)
                 .padding(.top, 32)
 
                 Spacer()
@@ -100,6 +117,11 @@ struct WalletView: View {
         }
         .padding(24)
         .navigationTitle("")
+        .navigationDestination(isPresented: $showAddBalanceView, destination: {
+            AddBalanceView(showAddBalanceView: $showAddBalanceView, router: MainRouter(isPresented: .constant(.main)), onsuccess: {
+                loadData()
+            })
+        })
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack {
@@ -109,9 +131,28 @@ struct WalletView: View {
                 }
             }
         }
+        .onAppear {
+            loadData()
+        }
+        .onChange(of: viewModel.errorMessage) { errorMessage in
+            if let errorMessage = errorMessage {
+                router.presentToastPopup(view: .error(LocalizedStringKey.error, errorMessage))
+            }
+        }
     }
 }
 
 #Preview {
     WalletView(settings: UserSettings(), router: MainRouter(isPresented: .constant(.main)))
+}
+
+extension WalletView {
+    func loadData() {
+        viewModel.walletDataItems.removeAll()
+        viewModel.fetchWallet(page: 0, limit: 10)
+    }
+    
+    func loadMore() {
+        viewModel.loadMoreWalletItems(limit: 10)
+    }
 }

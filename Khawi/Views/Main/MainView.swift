@@ -33,9 +33,9 @@ struct MainView: View {
                         case .home:
                             HomeView(showPopUp: $showPopUp, router: router)
                         case .orders:
-                            OrdersView()
+                            OrdersView(router: router)
                         case .notifications:
-                            NotificationsView()
+                            NotificationsView(router: router)
                         case .settings:
                             SettingsView(settings: settings, router: router)
                         }

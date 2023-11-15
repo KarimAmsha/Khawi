@@ -11,6 +11,7 @@ struct ContentView: View {
     @State var isActive: Bool = false
     @EnvironmentObject var settings: UserSettings
     @StateObject private var router = MainRouter(isPresented: .constant(.main))
+    @ObservedObject var monitor = Monitor()
 
     var body: some View {
         VStack {
@@ -24,7 +25,7 @@ struct ContentView: View {
                     )
                 } else {
                     AnyView(
-                        WelcomeView()
+                        WelcomeView(router: router)
                             .transition(.scale)
                     )
                 }
@@ -33,13 +34,16 @@ struct ContentView: View {
                 SplashView()
             }
         }
+        .onChange(of: monitor.status) { status in
+            if status == .disconnected {
+                router.presentToastPopup(view: .error(LocalizedStringKey.error, LocalizedError.noInternetConnection))
+            }
+        }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 withAnimation {
                     // Change the state of 'isActive' to show home view
                     self.isActive = true
-                    settings.myInfo = ["image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCf88fHpbl1Md8FKJYLsEV_S-fyU9BTzmy69XneVmtWdo9X2CNho7HgKfLjBdw5IY6XvM&usqp=CAU", "name": "أحمد"]
-//                    settings.loggedIn = true
                 }
             }
         }

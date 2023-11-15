@@ -10,7 +10,7 @@ import MapKit
 
 class Utilities: NSObject {
     // Helper function to get the address for a given coordinate
-    func getAddress(for coordinate: CLLocationCoordinate2D, completion: @escaping (String) -> Void) {
+    static func getAddress(for coordinate: CLLocationCoordinate2D, completion: @escaping (String) -> Void) {
         let geocoder = CLGeocoder()
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
 
@@ -18,15 +18,16 @@ class Utilities: NSObject {
             if let placemark = placemarks?.first {
                 var addressComponents: [String] = []
 
+                if let thoroughfare = placemark.thoroughfare {
+                    addressComponents.append(thoroughfare)
+                }
+                if let locality = placemark.locality {
+                    addressComponents.append(locality)
+                }
                 if let name = placemark.name {
                     addressComponents.append(name)
                 }
-    //                if let thoroughfare = placemark.thoroughfare {
-    //                    addressComponents.append(thoroughfare)
-    //                }
-    //                if let locality = placemark.locality {
-    //                    addressComponents.append(locality)
-    //                }
+
     //                if let administrativeArea = placemark.administrativeArea {
     //                    addressComponents.append(administrativeArea)
     //                }

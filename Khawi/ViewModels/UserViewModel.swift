@@ -5,4 +5,204 @@
 //  Created by Karim Amsha on 5.11.2023.
 //
 
-import Foundation
+import SwiftUI
+import Combine
+
+class UserViewModel: ObservableObject {
+    @Published var user: User?
+    private var cancellables = Set<AnyCancellable>()
+    @Published var errorTitle: String = LocalizedStringKey.error
+    @Published var errorMessage: String?
+    @Published var isLoading: Bool = false
+    private let errorHandling: ErrorHandling
+    private let dataProvider = DataProvider.shared
+    @Published var uploadProgress: Double? // Use an optional Double
+    @Published var userSettings = UserSettings.shared // Use the shared instance of UserSettings
+
+    init(errorHandling: ErrorHandling) {
+        self.errorHandling = errorHandling
+    }
+    
+    func updateUploadProgress(newProgress: Double) {
+        uploadProgress = newProgress
+    }
+    
+    func startUpload() {
+        isLoading = true
+    }
+
+    func finishUpload() {
+        isLoading = false
+    }
+
+    func updateUserDataWithImage(imageData: Data?, additionalParams: [String: Any], onsuccess: @escaping () -> Void) {
+        guard let token = userSettings.token else {
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            return
+        }
+        
+        self.updateUploadProgress(newProgress: 0) // Initialize the progress to 0%
+        startUpload()
+
+        var endpoint: DataProvider.Endpoint
+        var imageFiles: [(Data, String)] = []
+        if let imageData = imageData {
+            endpoint = .updateUserDataWithImage(params: additionalParams, imageData: imageData, token: token)
+            imageFiles.append((imageData, "image"))
+        } else {
+            // In this case, you still want to send a request with additionalParams
+            endpoint = .updateUserDataWithImage(params: additionalParams, imageData: nil, token: token)
+        }
+        
+        dataProvider.requestMultipart(endpoint: endpoint, imageFiles: imageFiles, responseType: SingleAPIResponse<User>.self)
+            .sink(receiveCompletion: { [weak self] completion in
+                switch completion {
+                case .finished:
+                    self?.updateUploadProgress(newProgress: 1.0) // Set progress to 100% when the upload is complete
+                    self?.finishUpload()
+                case .failure(let error):
+                    // Handle the error
+                    self?.handleAPIError(error)
+                    self?.finishUpload()
+                }
+            }, receiveValue: { (response, uploadProgress) in
+                if response.status {
+                    // Handle the successful response, if needed
+                    self.updateUploadProgress(newProgress: uploadProgress) // The upload progress (0.0 to 1.0)
+                    self.user = response.items // The user object
+                    self.handleUserData()
+                    self.errorMessage = nil
+                    onsuccess()
+                } else {
+                    // Use the centralized error handling component
+                    self.handleAPIError(.customError(message: response.message))
+                }
+
+            })
+            .store(in: &cancellables)
+    }
+    
+    func fetchUserData(onsuccess: @escaping () -> Void) {
+        guard let token = userSettings.token else {
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        let endpoint = DataProvider.Endpoint.getUserProfile(token: token)
+        
+        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<User>.self)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
+                }
+            }, receiveValue: { [weak self] (response: SingleAPIResponse<User>) in
+                if response.status {
+                    self?.user = response.items
+                    self?.errorMessage = nil
+                    onsuccess()
+                } else {
+                    // Use the centralized error handling component
+                    self?.handleAPIError(.customError(message: response.message))
+                }
+                self?.isLoading = false
+            })
+            .store(in: &cancellables)
+    }
+    
+    func addReview(orderID: String, params: [String: Any], onsuccess: @escaping (String) -> Void) {
+        guard let token = userSettings.token else {
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        let endpoint = DataProvider.Endpoint.addReview(orderID: orderID, params: params, token: token)
+        
+        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<User>.self)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
+                }
+            }, receiveValue: { [weak self] (response: SingleAPIResponse<User>) in
+                if response.status {
+                    self?.errorMessage = nil
+                    onsuccess(response.message)
+                } else {
+                    // Use the centralized error handling component
+                    self?.handleAPIError(.customError(message: response.message))
+                }
+                self?.isLoading = false
+            })
+            .store(in: &cancellables)
+    }    
+    
+    func addComplain(params: [String: Any], onsuccess: @escaping (String) -> Void) {
+        guard let token = userSettings.token else {
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        let endpoint = DataProvider.Endpoint.addComplain(params: params, token: token)
+        
+        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<Complain>.self)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
+                }
+            }, receiveValue: { [weak self] (response: SingleAPIResponse<Complain>) in
+                if response.status {
+                    self?.errorMessage = nil
+                    onsuccess(response.message)
+                } else {
+                    // Use the centralized error handling component
+                    self?.handleAPIError(.customError(message: response.message))
+                }
+                self?.isLoading = false
+            })
+            .store(in: &cancellables)
+    }
+}
+
+extension UserViewModel {
+    private func handleAPIError(_ error: APIClient.APIError) {
+        let errorDescription = errorHandling.handleAPIError(error)
+        errorMessage = errorDescription
+    }
+    
+    func handleUserData() {
+        if let user = self.user {
+            UserSettings.shared.login(user: user, id: user._id ?? "", token: user.token ?? "")
+        }
+    }
+}
+
+extension UserViewModel {
+    func updateUserLocation(location: FBUserLocation) {
+        guard let id = userSettings.id else {
+            return
+        }
+
+        Constants.userLocationRef.child(id).updateChildValues(location.toDictionary()) { (error, reference) in
+            if let error = error {
+                self.handleAPIError(.customError(message: error.localizedDescription))
+            }
+        }
+    }
+}

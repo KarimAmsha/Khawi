@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+struct Pagination: Codable {
+    let size: Int?
+    let totalElements: Int?
+    let totalPages: Int?
+    let pageNumber: Int?
+}

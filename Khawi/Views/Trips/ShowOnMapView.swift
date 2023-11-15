@@ -15,17 +15,34 @@ struct ShowOnMapView: View {
         center: CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
-    @Binding var startCoordinate: CLLocationCoordinate2D?
-    @Binding var endCoordinate: CLLocationCoordinate2D?
+     let order: Order?
+    @State private var selectedResult: MKMapItem?
+    @State private var route2: MKRoute?
+    
+    @State var requestLocation: CLLocationCoordinate2D?
+    @State var requestLocation2: CLLocationCoordinate2D?
+    @State var destinationLocation: CLLocationCoordinate2D?
+    @State var destination2: CLLocationCoordinate2D?
 
     var body: some View {
         VStack {
-            MapViewRepresentable(region: $region, annotations: $mapAnnotations, route: $route)
-                .onAppear {
-                    addAnnotation(coordinate: $startCoordinate, title: "Start", imageName: "ic_start_point")
-                    addAnnotation(coordinate: $endCoordinate, title: "End", imageName: "ic_end_point")
-                    createRoute()
-                }
+            MyMapView(requestLocation: Binding(
+                          get: { requestLocation ?? CLLocationCoordinate2D() },
+                          set: { requestLocation = $0 }
+                      ),
+                      requestLocation2: Binding(
+                          get: { requestLocation2 ?? CLLocationCoordinate2D() },
+                          set: { requestLocation2 = $0 }
+                      ),
+                      destinationLocation: Binding(
+                          get: { destinationLocation ?? CLLocationCoordinate2D() },
+                          set: { destinationLocation = $0 }
+                      ),
+                      destination2: Binding(
+                          get: { destination2 ?? CLLocationCoordinate2D() },
+                          set: { destination2 = $0 }
+                      ), order: order!
+            )
         }
         .edgesIgnoringSafeArea(.bottom)
         .navigationTitle("")
@@ -38,25 +55,22 @@ struct ShowOnMapView: View {
                 }
             }
         }
-    }
-    
-    func addAnnotation(coordinate: Binding<CLLocationCoordinate2D?>, title: String, imageName: String) {
-        if let coord = coordinate.wrappedValue {
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = coord
-            annotation.title = title
-            mapAnnotations.append(annotation)
-        }
-    }
-
-    func createRoute() {
-        if let startCoordinate = startCoordinate, let endCoordinate = endCoordinate {
-            let coordinates = [startCoordinate, endCoordinate]
-            route = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        .onAppear {
+            if let startCoordinate = order?.f_lat, let startLongitude = order?.f_lng,
+               let endCoordinate = order?.t_lat, let endLongitude = order?.t_lng {
+                requestLocation = CLLocationCoordinate2D(latitude: startCoordinate, longitude: startLongitude)
+                requestLocation2 = CLLocationCoordinate2D(latitude: startCoordinate, longitude: startLongitude)
+                destinationLocation = CLLocationCoordinate2D(latitude: endCoordinate, longitude: endLongitude)
+                destination2 = CLLocationCoordinate2D(latitude: startCoordinate, longitude: endLongitude)
+                
+                region.center = requestLocation ?? CLLocationCoordinate2D(latitude: 0, longitude: 0)
+                region.span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            }
         }
     }
 }
 
 #Preview {
-    ShowOnMapView(startCoordinate: .constant(CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)), endCoordinate: .constant(CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)))
+    ShowOnMapView(order: nil)
 }
+

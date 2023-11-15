@@ -12,19 +12,40 @@ struct WelcomeSlideView: View {
 
     var body: some View {
         VStack {
-            Image(item.imageName)
-                .resizable()
-                .scaledToFit()
+            VStack {
+                AsyncImage(url: item.icon?.toURL()) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(height: 285)
+                    case .failure:
+                        Image(systemName: "photo")
+                            .resizable()
+                            .imageScale(.large)
+                            .foregroundColor(.gray595959())
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
                 .frame(height: 285)
+            }
+            .padding(16)
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2) 
 
             VStack {
-                Text(item.title)
+                Text(item.Title ?? "")
                     .customFont(weight: .book, size: 24)
                     .foregroundColor(.black141F1F())
                     .multilineTextAlignment(.center)
                     .padding(.top, 20)
 
-                Text(item.description)
+                Text(item.Description ?? "")
                     .customFont(weight: .book, size: 16)
                     .foregroundColor(.gray929292())
                     .multilineTextAlignment(.center)
@@ -39,6 +60,6 @@ struct WelcomeSlideView: View {
 
 struct WelcomeSlideView_Previews: PreviewProvider {
     static var previews: some View {
-        WelcomeSlideView(item: WelcomeItem(imageName: "slider1", titleKey: LocalizedStringKey.shareYourPathWithOthers, descriptionKey: LocalizedStringKey.descriptionKey))
+        WelcomeSlideView(item: WelcomeItem(_id: "", icon: "", Title: "", Description: ""))
     }
 }

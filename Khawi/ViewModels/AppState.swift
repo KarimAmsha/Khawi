@@ -18,9 +18,9 @@ class AppState: ObservableObject {
     @Published var toastTitle: String = ""
     @Published var toastMessage: String = ""
     @Published var selection = 0
-    @Published var selectedTrip: Trip?
-    @Published var startPoint: PointItem?
-    @Published var endPoint: PointItem?
+    @Published var selectedOrder: Order?
+    @Published var startPoint: Mark?
+    @Published var endPoint: Mark?
     @Published var showingDatePicker = false
     @Published var showingTimePicker = false
     @Published var startCoordinate: CLLocationCoordinate2D? = CLLocationCoordinate2D(latitude: 24.1136, longitude: 46.3753)
@@ -55,5 +55,10 @@ class AppState: ObservableObject {
         showingErrorToastStatus = false
         toastTitle = ""
         toastMessage = ""
+    }
+    
+    func clearMarks() {
+        startPoint = nil
+        endPoint = nil
     }
 }

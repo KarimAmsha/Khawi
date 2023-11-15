@@ -9,52 +9,62 @@ import SwiftUI
 
 struct WelcomeView: View {
     @State private var currentPage = 0
-    @State private var showNextView = false
-    @State private var items: [WelcomeItem] = [
-        WelcomeItem(imageName: "slider1", titleKey: LocalizedStringKey.shareYourPathWithOthers, descriptionKey: LocalizedStringKey.descriptionKey),
-        WelcomeItem(imageName: "slider2", titleKey: LocalizedStringKey.gettingToYourDestinationIsEasier, descriptionKey: LocalizedStringKey.descriptionKey),
-        WelcomeItem(imageName: "slider3", titleKey: LocalizedStringKey.investYourCar, descriptionKey: LocalizedStringKey.descriptionKey)
-    ]
     @EnvironmentObject var languageManager: LanguageManager
-    @ObservedObject var authViewModel: AuthViewModel
+    @EnvironmentObject var settings: UserSettings
+    @StateObject private var router: MainRouter
+    @StateObject private var viewModel = InitialViewModel(errorHandling: ErrorHandling())
+    private let errorHandling = ErrorHandling()
+
+    init(router: MainRouter) {
+        _router = StateObject(wrappedValue: router)
+    }
 
     var body: some View {
-        NavigationStack {
+        RoutingView(router: router) {
             VStack {
-                TabView(selection: $currentPage) {
-                    ForEach(0..<items.count, id: \.self) { index in
-                        WelcomeSlideView(item: items[index])
-                            .tag(index)
+                if viewModel.isLoading {
+                    LoadingView()
+                } else if let items = viewModel.welcomeItems {
+                    TabView(selection: $currentPage) {
+                        ForEach(0..<items.count, id: \.self) { index in
+                            WelcomeSlideView(item: items[index])
+                                .tag(index)
+                        }
                     }
+                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
                 }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
 
-                WelcomeControlDots(numberOfPages: items.count, currentPage: $currentPage)
+                WelcomeControlDots(numberOfPages: viewModel.welcomeItems?.count ?? 0, currentPage: $currentPage)
                     .padding(.top, 20)
 
                 Button(action: {
-                    if currentPage < items.count - 1 {
+                    if currentPage < (viewModel.welcomeItems?.count ?? 0) - 1 {
                         currentPage += 1 // Go to the next slide
-                    } else if currentPage == items.count - 1 {
-                        showNextView = true
+                    } else if currentPage == (viewModel.welcomeItems?.count ?? 0) - 1 {
+                        router.presentViewSpec(viewSpec: .register)
                     }
                 }) {
-                    Text(currentPage == items.count - 1 ? LocalizedStringKey.createNewAccount : LocalizedStringKey.next)
+                    Text(currentPage == (viewModel.welcomeItems?.count ?? 0) - 1 ? LocalizedStringKey.createNewAccount : LocalizedStringKey.next)
                 }
                 .buttonStyle(PrimaryButton(fontSize: 18, fontWeight: .book, background: .primary(), foreground: .white, height: 48, radius: 12))
                 .padding(.horizontal, 24)
                 .padding(.vertical, 24)
             }
             .navigationTitle("")
-            .navigationDestination(isPresented: $showNextView) {
-                RegisterView()
-            }
         }
         .accentColor(.black141F1F())
+        .onAppear {
+            viewModel.fetchWelcomeItems()
+        }
+        .onChange(of: viewModel.errorMessage) { errorMessage in
+            if let errorMessage = errorMessage {
+                router.presentToastPopup(view: .error("", errorMessage))
+            }
+        }
     }
 }
 
 #Preview {
-    WelcomeView(authViewModel: AuthViewModel())
+    WelcomeView(router: MainRouter(isPresented: .constant(.main)))
         .environmentObject(LanguageManager())
 }

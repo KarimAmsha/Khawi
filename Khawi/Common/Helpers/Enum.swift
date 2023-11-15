@@ -87,29 +87,111 @@ enum RequestType {
     }
 }
 
-enum OrderType {
-    case opened
-    case completed
-    case canceled
+enum OrderType: Int, Codable {
+    case joining = 1
+    case delivery = 2
     
-    var value : String {
+    init(_ type: Int) {
+        switch type {
+        case 1: self = .joining
+        case 2: self = .delivery
+        default:
+            self = .joining
+        }
+    }
+    
+    var value: String {
         switch self {
-        case .opened: return LocalizedStringKey.openedOrder
-        case .completed: return LocalizedStringKey.completed
-        case .canceled: return LocalizedStringKey.canceled
+        case .joining: return LocalizedStringKey.joiningRequest
+        case .delivery: return LocalizedStringKey.deliveryRequest
         }
     }
 }
 
-enum PopupView {
-    case joining
-    case delivery
-    case deliverySuccess
-    case joiningSuccess
-    case review
-    case error
-    case createJoiningSuccess
-    case createDeliverySuccess
+enum OrderStatus: String, Codable {
+    case new = "new"
+    case accepted = "accepted"
+    case started = "started"
+    case finished = "finished"
+    case canceledByDriver = "canceled_by_driver"
+    case canceledByUser = "canceled_by_user"
+    case canceled  = "canceled"
+    case rated  = "rated"
+
+    init(_ type: String) {
+        switch type {
+        case "new" : self = .new
+        case "accepted" : self = .accepted
+        case "started" : self = .started
+        case "finished" : self = .finished
+        case "canceled_by_driver" : self = .canceledByDriver
+        case "canceled_by_user" : self = .canceledByUser
+        case "canceled": self = .canceled
+        case "rated": self = .rated
+        default:
+            self = .new
+        }
+    }
+
+    var value: String {
+        switch self {
+        case .new: return LocalizedStringKey.currentOrder
+        case .accepted: return LocalizedStringKey.accepted
+        case .started: return LocalizedStringKey.started
+        case .finished: return LocalizedStringKey.finished
+        case .canceledByDriver: return LocalizedStringKey.canceledByDriver
+        case .canceledByUser: return LocalizedStringKey.canceledByUser
+        case .canceled: return LocalizedStringKey.canceled
+        case .rated: return LocalizedStringKey.completed
+        }
+    }
+    
+    var displayedValue: String {
+        switch self {
+        case .new: return LocalizedStringKey.openedOrder
+        case .accepted: return LocalizedStringKey.accepted
+        case .started: return LocalizedStringKey.started
+        case .finished: return LocalizedStringKey.completed
+        case .canceled: return LocalizedStringKey.canceledOrder
+        case .canceledByDriver: return LocalizedStringKey.canceledByDriver
+        case .canceledByUser: return LocalizedStringKey.canceledByUser
+        case .rated: return LocalizedStringKey.completed
+        }
+    }
+    
+    var displayedStatusValue: String {
+        switch self {
+        case .new: return LocalizedStringKey.new
+        case .accepted: return LocalizedStringKey.accepted
+        case .finished: return LocalizedStringKey.completed
+        case .started: return LocalizedStringKey.started
+        case .canceledByDriver: return LocalizedStringKey.canceledByDriver
+        case .canceledByUser: return LocalizedStringKey.canceledByUser
+        case .canceled: return LocalizedStringKey.canceledOrder
+        case .rated: return LocalizedStringKey.completed
+        }
+    }
+}
+
+enum OfferStatus: String, Codable {
+    case addOffer = "add_offer"
+    case acceptOffer = "accept_offer"
+    case rejectOffer = "reject_offer"
+    case attend  = "attend"
+    case notAttend  = "not_attend"
+}
+
+enum PopupView: Hashable {
+    case joining(Order)
+    case delivery(Order)
+    case deliverySuccess(String, String)
+    case joiningSuccess(String, String)
+    case review(Order)
+    case error(String, String)
+    case createJoiningSuccess(String, String)
+    case createDeliverySuccess(String, String)
+    case alert(AlertModel)
+    case inputAlert(AlertModelWithInput)
 }
 
 enum PointType {
@@ -118,11 +200,30 @@ enum PointType {
     case user
 }
 
+enum NotificationType: String, Codable {
+    case join = "1"
+    case deliver = "2"
+    
+    init(_ type: String) {
+        switch type {
+        case "1": self = .join
+        case "2": self = .deliver
+        default:
+            self = .join
+        }
+    }
+}
+
+enum NOTIFICATION_TYPE: Int {
+    case ORDERS = 1
+    case COUPON = 2
+    case GENERAL = 3
+}
+
 // Localization keys
 enum LocalizedStringKey {
     static let switchToEnglish = "Switch to English".localized
     static let switchToArabic = "Switch to Arabic".localized
-    static let noInternetConnection = "Internet Connection appears to be offline".localized
     static let shareYourPathWithOthers = "Share your path with others".localized
     static let gettingToYourDestinationIsEasier = "Getting to your destination is easier".localized
     static let investYourCar = "Invest your car".localized
@@ -164,9 +265,13 @@ enum LocalizedStringKey {
     static let tripNumber = "Trip Number".localized
     static let from = "From".localized
     static let to = "To".localized
+    static let currentOrder = "Current Order".localized
+    static let new = "New".localized
+    static let finished = "finished".localized
+    static let canceled = "canceled".localized
     static let openedOrder = "Opened Order".localized
     static let completed = "Completed".localized
-    static let canceled = "Canceled".localized
+    static let canceledOrder = "Canceled".localized
     static let showDetails = "Show Details".localized
     static let carInformation = "Car Information".localized
     static let tripDate = "Trip Date".localized
@@ -177,6 +282,7 @@ enum LocalizedStringKey {
     static let showOnMap = "Show On Map".localized
     static let tripDays = "Trip Day".localized
     static let driverInformations = "Driver Informations".localized
+    static let personInformations = "Person Informations".localized
     static let numberOfAvailableSeats = "Number of available seats".localized
     static let numberOfRequiredSeats = "Number of required seats".localized
     static let driverNotes = "Driver Notes".localized
@@ -194,7 +300,7 @@ enum LocalizedStringKey {
     static let joinToTrip = "Join To Trip".localized
     static let selectDetination = "Select the destination on the map".localized
     static let specifyPrice = "Specify the price".localized
-    static let rangeOfPrice = "The price should be between (25-100 SAR)".localized
+    static let rangeOfPrice = "The price should be between".localized
     static let isDailyTrip = "Is the trip daily?".localized
     static let tripTime = "Trip Time".localized
     static let tripPath = "Trip Path".localized
@@ -236,4 +342,45 @@ enum LocalizedStringKey {
     static let submitDeliveryRequest = "Submit Delivery Request".localized
     static let deliveryRequestSuccess = "Delivery request created successfully".localized
     static let yourLocation = "Your Location".localized
+    static let tokenError = "Error With Token".localized
+    static let logoutMessage = "Are you sure you want to logout!.".localized
+    static let message = "Message".localized
+    static let agreeOnTerms = "Please agree on terms and conditions".localized
+    static let successfullyUpdated = "Successfully Updated".localized
+    static let seats = "Seats".localized
+    static let deliveryOffers = "Delivery Offers".localized
+    static let accepted = "Accepted".localized
+    static let accept = "Accept".localized
+    static let started = "Started".localized
+    static let start = "Start".localized
+    static let finish = "Finish".localized
+    static let canceledByDriver = "Canceled By Driver".localized
+    static let canceledByUser = "Canceled By User".localized
+    static let attend = "Attend".localized
+    static let notAttend = "Not Attend".localized
+    static let description = "Description".localized
+    static let cancellationReason = "Cancellation Reason".localized
+    static let send = "Send".localized
+    static let delete = "Delete".localized
+    static let deleteMessage = "Are you sure you want to delete this item!..".localized
+    static let orderNo = "Order No".localized
+    static let payWithCard = "Pay with Card".localized
+    static let payWithApplePay = "Pay with Apple Pay".localized
+    static let amount = "Amount".localized
+    static let exceedsLimits = "Exceeds Limits".localized
+    static let acceptedOffers = "Accepted Offers".localized
+}
+
+enum LocalizedError {
+    static let noInternetConnection = "No internet connection. Please check your network.".localized
+    static let unknownNetworkError = "An unknown network error occurred.".localized
+    static let badRequest = "Bad request. Please check your input.".localized
+    static let unauthorized = "Unauthorized. Please log in.".localized
+    static let resourceNotFound = "Resource not found.".localized
+    static let serverError = "Server error. Please try again later.".localized
+    static let unknownError = "An unknown error occurred.".localized
+    static let invalidData = "Invalid data received.".localized
+    static let decodingError = "Decoding error".localized
+    static let invalidURL = "Invalid URL".localized
+    static let responseValidationFailed = "Response validation failed".localized
 }

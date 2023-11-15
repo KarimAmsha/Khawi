@@ -10,7 +10,11 @@ import SwiftUI
 struct SettingsView: View {
     @StateObject var settings: UserSettings
     @StateObject private var router: MainRouter
-    
+    private let errorHandling = ErrorHandling()
+    @StateObject private var initialViewModel = InitialViewModel(errorHandling: ErrorHandling())
+    @StateObject private var authViewModel = AuthViewModel(errorHandling: ErrorHandling())
+    let appURL = URL(string: "https://www.example.com")
+
     init(settings: UserSettings, router: MainRouter) {
         _settings = StateObject(wrappedValue: settings)
         _router = StateObject(wrappedValue: router)
@@ -21,7 +25,7 @@ struct SettingsView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 24) {
                     HStack(spacing: 16) {
-                        AsyncImage(url: settings.myUser.image?.toURL()) { phase in
+                        AsyncImage(url: settings.user?.image?.toURL()) { phase in
                             switch phase {
                             case .empty:
                                 ProgressView() // Placeholder while loading
@@ -42,7 +46,7 @@ struct SettingsView: View {
                         .frame(width: 56, height: 56)
                         .clipShape(Circle())
 
-                        Text(settings.myUser.name ?? "")
+                        Text(settings.user?.full_name ?? "")
                             .customFont(weight: .book, size: 20)
                             .foregroundColor(.black141F1F())
                         
@@ -78,7 +82,9 @@ struct SettingsView: View {
                     }
                     
                     Button {
-                        //
+                        if let item = initialViewModel.constantsItems?.filter({ $0.Type == "about" }).first {
+                            router.presentViewSpec(viewSpec: .constant(item))
+                        }
                     } label: {
                         HStack(spacing: 26) {
                             Image("ic_info")
@@ -98,7 +104,7 @@ struct SettingsView: View {
                     }
 
                     Button {
-                        //
+                        router.presentViewSpec(viewSpec: .addComplain)
                     } label: {
                         HStack(spacing: 26) {
                             Image("ic_chat")
@@ -118,7 +124,7 @@ struct SettingsView: View {
                     }
                     
                     Button {
-                        //
+                        shareApp()
                     } label: {
                         HStack(spacing: 26) {
                             Image("ic_share")
@@ -138,7 +144,9 @@ struct SettingsView: View {
                     }
 
                     Button {
-                        //
+                        if let item = initialViewModel.constantsItems?.filter({ $0.Type == "terms" }).first {
+                            router.presentViewSpec(viewSpec: .constant(item))
+                        }
                     } label: {
                         HStack(spacing: 26) {
                             Image("ic_help")
@@ -158,7 +166,7 @@ struct SettingsView: View {
                     }
                     
                     Button {
-                        //
+                        logout()
                     } label: {
                         HStack(spacing: 26) {
                             Image("ic_logout")
@@ -194,9 +202,44 @@ struct SettingsView: View {
                 }
             }
         }
+        .onAppear {
+            getConstants()
+        }
     }
 }
 
 #Preview {
     SettingsView(settings: UserSettings(), router: MainRouter(isPresented: .constant(.main)))
+}
+
+extension SettingsView {
+    private func logout() {
+        let alertModel = AlertModel(
+            title: LocalizedStringKey.logout,
+            message: LocalizedStringKey.logoutMessage,
+            hideCancelButton: false,
+            onOKAction: {
+                authViewModel.logoutUser {
+                }
+            },
+            onCancelAction: {
+                router.dismiss()
+            }
+        )
+        
+        router.presentToastPopup(view: .alert(alertModel))
+    }
+    
+    private func getConstants() {
+        initialViewModel.fetchConstantsItems()
+    }
+    
+    private func shareApp() {
+        if let appURL = appURL {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                let activityViewController = UIActivityViewController(activityItems: [appURL], applicationActivities: nil)
+                windowScene.windows.first?.rootViewController?.present(activityViewController, animated: true, completion: nil)
+            }
+        }
+    }
 }

@@ -8,17 +8,16 @@
 import SwiftUI
 
 struct RequestsRowView: View {
-    @StateObject var settings: UserSettings
-    @StateObject private var router: MainRouter
-
-    init(settings: UserSettings, router: MainRouter) {
-        _settings = StateObject(wrappedValue: settings)
-        _router = StateObject(wrappedValue: router)
-    }
+    let item: Offer
+    let type: OrderType
+    let settings: UserSettings
+    var onSelectDetails: () -> Void
+    var onSelectAttend: () -> Void
+    var onSelectNotAttend: () -> Void
 
     var body: some View {
         HStack(spacing: 16) {
-            AsyncImage(url: settings.myUser.image?.toURL()) { phase in
+            AsyncImage(url: item.user?.image?.toURL()) { phase in
                 switch phase {
                 case .empty:
                     ProgressView() // Placeholder while loading
@@ -42,15 +41,33 @@ struct RequestsRowView: View {
             )
             
             VStack(spacing: 6) {
-                Text("أحمد علي")
+                Text(item.user?.full_name ?? "")
                     .customFont(weight: .book, size: 16)
                     .foregroundColor(.black141F1F())
+                
+//                if type == .joining && settings.id != item.user?._id {
+//                    HStack {
+//                        Button {
+//                            onSelectAttend()
+//                        } label: {
+//                            Text(LocalizedStringKey.attend)
+//                        }
+//                        .buttonStyle(PrimaryButton(fontSize: 11, fontWeight: .book, background: .green46CF85(), foreground: .white, height: 30, radius: 8))
+//
+//                        Button {
+//                            onSelectNotAttend()
+//                        } label: {
+//                            Text(LocalizedStringKey.notAttend)
+//                        }
+//                        .buttonStyle(PrimaryButton(fontSize: 11, fontWeight: .book, background: .redFF5B5B(), foreground: .white, height: 30, radius: 8))
+//                    }
+//                }
             }
             
             Spacer()
             
             Button {
-                router.presentViewSpec(viewSpec: .showJoiningDetails)
+                onSelectDetails()
             } label: {
                 Text(LocalizedStringKey.showDetails)
                     .customFont(weight: .book, size: 12)
@@ -61,5 +78,5 @@ struct RequestsRowView: View {
 }
 
 #Preview {
-    RequestsRowView(settings: UserSettings(), router: MainRouter(isPresented: .constant(.main)))
+    RequestsRowView(item: Offer(id: nil, user: nil, f_address: nil, t_address: nil, f_lat: nil, f_lng: nil, t_lat: nil, t_lng: nil, price: nil, notes: nil, dt_date: nil, dt_time: nil, status: nil), type: .joining, settings: UserSettings(), onSelectDetails: {}, onSelectAttend: {}, onSelectNotAttend: {})
 }
