@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseDynamicLinks
 
 struct SettingsView: View {
     @StateObject var settings: UserSettings
@@ -14,6 +15,7 @@ struct SettingsView: View {
     @StateObject private var initialViewModel = InitialViewModel(errorHandling: ErrorHandling())
     @StateObject private var authViewModel = AuthViewModel(errorHandling: ErrorHandling())
     let appURL = URL(string: "https://www.example.com")
+    @State private var referralCode: String?
 
     init(settings: UserSettings, router: MainRouter) {
         _settings = StateObject(wrappedValue: settings)
@@ -144,6 +146,26 @@ struct SettingsView: View {
                     }
 
                     Button {
+                        createReferal()
+                    } label: {
+                        HStack(spacing: 26) {
+                            Image("ic_share")
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                                .padding(20)
+                                .background(Color.yellowFFFCF6().clipShape(Circle()))
+                            Text(LocalizedStringKey.inviteFriend)
+                                .customFont(weight: .book, size: 16)
+                                .foregroundColor(.black141F1F())
+                            Spacer()
+                            Image(systemName: "chevron.left")
+                                .resizable()
+                                .foregroundColor(.grayA4ACAD())
+                                .frame(width: 10, height: 16)
+                        }
+                    }
+
+                    Button {
                         if let item = initialViewModel.constantsItems?.filter({ $0.Type == "terms" }).first {
                             router.presentViewSpec(viewSpec: .constant(item))
                         }
@@ -235,10 +257,46 @@ extension SettingsView {
     }
     
     private func shareApp() {
-        if let appURL = appURL {
+        if let url = appURL {
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-                let activityViewController = UIActivityViewController(activityItems: [appURL], applicationActivities: nil)
+                let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
                 windowScene.windows.first?.rootViewController?.present(activityViewController, animated: true, completion: nil)
+            }
+        }
+    }
+        
+//    private func generateAndShareReferralLink(userID: String) {
+//        let link = "https://khawi.page.link/\(userID)"
+//
+//        guard let dynamicLink = URL(string: link) else {
+//            fatalError("Invalid URL")
+//        }
+//
+//        let dynamicLinkDomain = "https://khawi.page.link"
+//        let linkBuilder = DynamicLinkComponents(link: dynamicLink, domainURIPrefix: dynamicLinkDomain)
+//
+//        guard let finalLink = linkBuilder?.url else {
+//            fatalError("Invalid Dynamic Link")
+//        }
+//
+//        referralCode = finalLink.absoluteString
+//        print("finalLink \(finalLink)")
+//
+//        shareReferralLink(finalLink)
+//    }
+
+    private func shareReferralLink(_ link: URL) {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            let activityViewController = UIActivityViewController(activityItems: [link], applicationActivities: nil)
+            windowScene.windows.first?.rootViewController?.present(activityViewController, animated: true, completion: nil)
+        }
+    }
+    
+    private func createReferal() {
+        authViewModel.createReferal {
+            print(authViewModel.referal)
+            if let url = authViewModel.referal?.shortLink?.toURL() {
+                shareReferralLink(url)
             }
         }
     }

@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import MapKit
 
 enum ViewSpec: Equatable, Hashable {
     static func == (lhs: ViewSpec, rhs: ViewSpec) -> Bool {
@@ -60,6 +61,7 @@ enum ViewSpec: Equatable, Hashable {
     case smsVerification(String, String)
     case personalInfo
     case main
+    case welcome
     case list
     case detail(String)
     case joiningRequestOrderDetailsView(String)
@@ -75,7 +77,8 @@ enum ViewSpec: Equatable, Hashable {
     case driverJoinRequestDetails
     case showOfferDetails(Order, Offer)
     case newDeliveryRequest
-    case showOnMap(Order)
+    case showOnMap(Order, CLLocationCoordinate2D?)
+    case showOfferOnMap(Offer)
     case constant(ConstantItem)
     case addBalance
     case paymentView(PaymentType)

@@ -9,6 +9,7 @@ import SwiftUI
 import PaymentSDK
 
 struct AddBalanceView: View {
+    @State private var coupon = ""
     @State private var amount = ""
     @State private var showAlert = false
     @State private var alertMessage = ""
@@ -26,10 +27,13 @@ struct AddBalanceView: View {
     var body: some View {
         VStack(spacing: 20) {
             
+            CustomTextFieldWithTitle(text: $coupon, placeholder: LocalizedStringKey.coupon, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
+                .disabled(paymentState.isLoading)
+            
             CustomTextFieldWithTitle(text: $amount, placeholder: LocalizedStringKey.amount, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
                 .keyboardType(.numberPad)
                 .disabled(paymentState.isLoading)
-            
+
             if let errorMessage = paymentState.errorMessage {
                 Text(errorMessage)
                     .customFont(weight: .book, size: 14)
@@ -41,7 +45,7 @@ struct AddBalanceView: View {
             }
 
             Button {
-                startPayment()
+                checkCoupon()
             } label: {
                 Text(LocalizedStringKey.send)
             }
@@ -55,6 +59,11 @@ struct AddBalanceView: View {
         .alert(isPresented: $showAlert) {
             Alert(title: Text(LocalizedStringKey.error), message: Text(alertMessage), dismissButton: .default(Text(LocalizedStringKey.ok)))
         }
+        .onChange(of: paymentState.errorMessage) { errorMessage in
+            if let errorMessage = errorMessage {
+                router.presentToastPopup(view: .error(LocalizedStringKey.error, errorMessage))
+            }
+        }
         .onChange(of: paymentState.paymentSuccess) { paymentSuccess in
             // Do something when payment is successful
             if paymentSuccess {
@@ -65,16 +74,34 @@ struct AddBalanceView: View {
 }
 
 extension AddBalanceView {
-    func startPayment() {
-        guard !amount.isEmpty else {
-            paymentState.errorMessage = LocalizedStringKey.addAccount
-            return
+    func checkCoupon() {
+        let params: [String: Any] = [
+            "coupon": coupon,
+            "amount": amount.toDouble() ?? 0.0
+        ]
+        
+        if coupon.isEmpty {
+            guard !amount.isEmpty else {
+                paymentState.errorMessage = LocalizedStringKey.addAccount
+                return
+            }
+            startPayment(amount: amount.toDouble() ?? 0.0)
+        } else {
+            paymentState.checkCoupon(params: params) {
+                startPayment(amount: paymentState.coupon?.final_total?.toDouble() ?? 0.0)
+            }
         }
-        paymentState.startCardPayment(amount: amount.toDouble() ?? 0.0)
+    }
+    
+    func startPayment(amount: Double) {
+        paymentState.startCardPayment(amount: amount)
     }
     
     func addBalance() {
-        let params: [String: Any] = ["amount": amount.toDouble() ?? 0.0]
+        let params: [String: Any] = [
+            "amount": coupon.isEmpty ? amount.toDouble() ?? 0.0 : paymentState.coupon?.final_total?.toDouble() ?? 0.0,
+            "coupon": coupon,
+        ]
         
         paymentState.addBalanceToWallet(params: params) { message in
             showAddBalanceView = false

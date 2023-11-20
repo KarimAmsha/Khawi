@@ -23,6 +23,7 @@ struct ShowOnMapView: View {
     @State var requestLocation2: CLLocationCoordinate2D?
     @State var destinationLocation: CLLocationCoordinate2D?
     @State var destination2: CLLocationCoordinate2D?
+    @State var driverLocation: CLLocationCoordinate2D?
 
     var body: some View {
         VStack {
@@ -41,7 +42,10 @@ struct ShowOnMapView: View {
                       destination2: Binding(
                           get: { destination2 ?? CLLocationCoordinate2D() },
                           set: { destination2 = $0 }
-                      ), order: order!
+                          
+                      ),
+                      driverLocation: $driverLocation, // Pass the driver's location
+                      order: order!
             )
         }
         .edgesIgnoringSafeArea(.bottom)

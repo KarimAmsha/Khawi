@@ -60,3 +60,16 @@ private struct ExampleButtonStyle: ButtonStyle {
             .background(configuration.isPressed ? background.opacity(0.55) : background)
     }
 }
+
+extension View {
+    func placeholder<Content: View>(
+        when shouldShow: Bool,
+        alignment: Alignment = .leading,
+        @ViewBuilder placeholder: () -> Content) -> some View {
+            
+            ZStack(alignment: alignment) {
+                placeholder().opacity(shouldShow ? 1 : 0)
+                self
+            }
+        }
+}

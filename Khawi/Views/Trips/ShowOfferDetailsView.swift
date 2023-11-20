@@ -83,7 +83,7 @@ struct ShowOfferDetailsView: View {
                     }
                     
                     Button {
-                        router.presentViewSpec(viewSpec: .showOnMap(order))
+                        router.presentViewSpec(viewSpec: .showOfferOnMap(offer))
                     } label: {
                         Text(LocalizedStringKey.showOnMap)
                             .customFont(weight: .book, size: 12)

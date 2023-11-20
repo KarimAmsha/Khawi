@@ -34,29 +34,15 @@ class NotificationHandler: ObservableObject {
     }
 
     func handleRemoteNotification(userInfo: [AnyHashable: Any]) {
-        if let data = userInfo["data"] as? String,
-           let rawType = userInfo["type"] as? Int,
-           let type = NOTIFICATION_TYPE(rawValue: rawType) {
-
-            switch type {
-            case .ORDERS:
-                handleOrdersNotification(data: data)
-            case .COUPON:
-                handleCouponNotification(data: data)
-            case .GENERAL:
-                handleGeneralNotification(data: data)
-            }
-        } else {
-            print("Unable to extract required values from userInfo.")
-        }
+        print("ffff \(userInfo)")
+        NotificationCenter.default.post(name: NotificationHandler.orderNotificationUpdateNotification, object: nil)
     }
 
-    private func handleOrdersNotification(data: String) {
+    private func handleOrderNotification(data: String) {
         DispatchQueue.main.async {
             self.orderID = data
             self.notificationType = .ORDERS
             // Notify observers about the order notification
-            NotificationCenter.default.post(name: NotificationHandler.orderNotificationUpdateNotification, object: nil)
         }
         print("Handling orders notification with data: \(data)")
     }

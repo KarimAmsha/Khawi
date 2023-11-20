@@ -97,8 +97,10 @@ private extension MainRouter {
             ShowOfferDetailsView(order: order, offer: offer, settings: settings, router: self)
         case .newDeliveryRequest:
             NewDeliveryRequestView(router: self)
-        case .showOnMap(let order):
-            ShowOnMapView(order: order)
+        case .showOnMap(let order, let driverLocation):
+            ShowOnMapView(order: order, driverLocation: driverLocation)
+        case .showOfferOnMap(let offer):
+            ShowOfferOnMapView(offer: offer)
         case .constant(let item):
             ConstantView(item: item)
         case .addComplain:

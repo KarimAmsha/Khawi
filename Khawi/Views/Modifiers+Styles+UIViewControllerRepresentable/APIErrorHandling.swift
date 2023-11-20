@@ -25,6 +25,8 @@ class ErrorHandling {
             return LocalizedError.resourceNotFound
         case .serverError:
             return LocalizedError.serverError
+        case .invalidToken:
+            return LocalizedError.invalidToken
         case .customError(message: let message):
             return message
         case .requestError(let afError):

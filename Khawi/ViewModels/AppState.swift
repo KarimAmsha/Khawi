@@ -25,6 +25,7 @@ class AppState: ObservableObject {
     @Published var showingTimePicker = false
     @Published var startCoordinate: CLLocationCoordinate2D? = CLLocationCoordinate2D(latitude: 24.1136, longitude: 46.3753)
     @Published var endCoordinate: CLLocationCoordinate2D? = CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753)
+    @Published var referalUrl: URL?
 
     init() {
         

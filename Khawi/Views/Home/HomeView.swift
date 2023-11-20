@@ -224,10 +224,11 @@ extension HomeView {
             if let location = location {
                 // Update your UI or perform actions with the location
                 userLocation = location
-                userViewModel.updateUserLocation(location: FBUserLocation(driverName: settings.user?.full_name ?? "", driverPhone: Int64(settings.user?.phone_number ?? "") ?? 0, g: String.randomStringWithDigits(10), l: [location.latitude, location.longitude]))
+                userViewModel.updateUserLocation(location: FBUserLocation(driverName: settings.user?.full_name ?? "", driverPhone: Int64(settings.user?.phone_number ?? "") ?? 0, g: String.randomStringWithDigitsAndChars(10), l: [location.latitude, location.longitude]))
+                LocationManager.shared.stopUpdatingLocation()
             } else {
                 print("Failed to get the user's location")
             }
         }
-    }
+    }    
 }

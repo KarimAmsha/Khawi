@@ -27,7 +27,7 @@ struct NotificationsView: View {
                         .onTapGesture {
                             if item.notificationType == .join {
                                 router.presentViewSpec(viewSpec: .joiningRequestOrderDetailsView(item.bodyParams ?? ""))
-                            } else {
+                            } else if item.notificationType == .deliver {
                                 router.presentViewSpec(viewSpec: .deliveryRequestOrderDetailsView(item.bodyParams ?? ""))
                             }
                         }
@@ -82,6 +82,7 @@ struct NotificationsView: View {
 
 extension NotificationsView {
     func loadData() {
+        viewModel.notificationsItems.removeAll()
         viewModel.fetchNotificationsItems(page: 0, limit: 10)
     }
     

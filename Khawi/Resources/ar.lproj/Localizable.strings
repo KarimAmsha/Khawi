@@ -165,3 +165,7 @@
 "Amount" = "الرصيد";
 "Exceeds Limits" = "تجاوز الحد الاقصى";
 "Accepted Offers" = "العروض المقبولة";
+"Invalid Token" = "انتهت صلاحية رمزك الشخصي, الرجاء الدخول مرة اخرى";
+"Your country" = "بلدك";
+"Coupon" = "الكوبون";
+"Invite Friend" = "دعوة صديق";

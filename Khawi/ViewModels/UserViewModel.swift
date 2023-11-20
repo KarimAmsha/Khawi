@@ -205,4 +205,32 @@ extension UserViewModel {
             }
         }
     }
+    
+    func trackingUserLocation(item: Tracking) {
+        Constants.trackingRef.child(item.orderId ?? "").updateChildValues(item.toDictionary()) { (error, reference) in
+            if let error = error {
+                self.handleAPIError(.customError(message: error.localizedDescription))
+            }
+        }
+    }
+
+    func deleteUserLocation(id: String) {
+        Constants.trackingRef.child(id).removeValue { (error, reference) in
+            if let error = error {
+                self.handleAPIError(.customError(message: error.localizedDescription))
+            }
+        }
+    }
+    
+    func observeDriverLocation(orderID: String, completion: @escaping (Tracking) -> Void) {
+        Constants.trackingRef.child(orderID).observe(.value) { snapshot in
+            guard snapshot.exists() else {
+                // Handle case when the snapshot does not exist (location not found, etc.)
+                return
+            }
+
+            let tracking = Tracking(snapshot)
+            completion(tracking)
+        }
+    }
 }

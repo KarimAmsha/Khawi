@@ -21,6 +21,9 @@ struct JoiningRequestOrderDetailsView: View {
     @StateObject private var router: MainRouter
     private let errorHandling = ErrorHandling()
     @StateObject private var viewModel = OrdersViewModel(initialRegion: MKCoordinateRegion(), errorHandling: ErrorHandling())
+    @State private var userLocation: CLLocationCoordinate2D? = nil
+    @StateObject var userViewModel = UserViewModel(errorHandling: ErrorHandling())
+    @State private var driverLocation: CLLocationCoordinate2D?
 
     init(settings: UserSettings, orderID: String, router: MainRouter) {
         _settings = StateObject(wrappedValue: settings)
@@ -42,7 +45,7 @@ struct JoiningRequestOrderDetailsView: View {
                                 .customFont(weight: .book, size: 12)
                                 .foregroundColor(.gray898989())
                             Spacer()
-                            Text(viewModel.order?.orderStatus?.displayedStatusValue ?? "")
+                            Text(viewModel.order?.displayedOrderStatus?.displayedValue ?? "")
                                 .customFont(weight: .bold, size: 10)
                                 .foregroundColor(.blue0094FF())
                                 .padding(.horizontal, 30)
@@ -52,7 +55,7 @@ struct JoiningRequestOrderDetailsView: View {
                         Text("\(viewModel.order?.title ?? "") :\(LocalizedStringKey.tripTitle)")
                             .customFont(weight: .bold, size: 16)
                             .foregroundColor(.black141F1F())
-                        HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
                             HStack(spacing: 4) {
                                 Text(":\(LocalizedStringKey.from)")
                                     .foregroundColor(.black141F1F())
@@ -70,7 +73,7 @@ struct JoiningRequestOrderDetailsView: View {
                         
                         Button {
                             if let order = viewModel.order {
-                                router.presentViewSpec(viewSpec: .showOnMap(order))
+                                router.presentViewSpec(viewSpec: .showOnMap(order, driverLocation))
                             }
                         } label: {
                             Text(LocalizedStringKey.showOnMap)
@@ -110,7 +113,7 @@ struct JoiningRequestOrderDetailsView: View {
                             if !otherOffers.isEmpty {
                                 CustomDivider()
                                 VStack(alignment: .leading, spacing: 16) {
-                                    Text(LocalizedStringKey.deliveryOffers)
+                                    Text(LocalizedStringKey.joiningRequest)
                                         .customFont(weight: .book, size: 14)
                                         .foregroundColor(.gray4E5556())
                                     
@@ -257,8 +260,8 @@ struct JoiningRequestOrderDetailsView: View {
                             
                             if let order = viewModel.order,
                                order.orderStatus == .finished,
-                               let orderID = order._id,
-                               let userID = order.offers?.first(where: { $0.user?._id == settings.id && $0.status == "accept_offer" })?.user?._id {
+                               let acceptedOffer = order.offers?.first(where: { $0.user?._id == settings.id && $0.status == "accept_offer" }),
+                               let acceptedUserId = acceptedOffer.user?._id {
 
                                 Button {
                                     // Use userID in review
@@ -271,6 +274,7 @@ struct JoiningRequestOrderDetailsView: View {
                                 }
                                 .buttonStyle(CustomButtonStyle())
                             }
+
                         }
                     }
                     
@@ -411,6 +415,7 @@ struct JoiningRequestOrderDetailsView: View {
                                     // Handle started status
                                     Button {
                                         updateOrderStatus(status: .started)
+                                        fetchAndTrackingDriverLocation()
                                     } label: {
                                         Text(LocalizedStringKey.start)
                                     }
@@ -419,6 +424,7 @@ struct JoiningRequestOrderDetailsView: View {
                                     // Handle finished status
                                     Button {
                                         updateOrderStatus(status: .finished)
+                                        deleteAndstopUpdateDriverLocation()
                                     } label: {
                                         Text(LocalizedStringKey.finish)
                                     }
@@ -473,6 +479,8 @@ struct JoiningRequestOrderDetailsView: View {
         }
         .onAppear {
             getOrderDetails()
+            fetchAndTrackingDriverLocation()
+            observeDriverLocation()
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
@@ -538,5 +546,33 @@ extension JoiningRequestOrderDetailsView {
                 getOrderDetails()
             })
         })
+    }
+    
+    private func fetchAndTrackingDriverLocation() {
+        if let order = viewModel.order, order.user?._id == settings.id {
+            LocationManager.shared.getCurrentLocation { location in
+                if let location = location {
+                    userLocation = location
+                    userViewModel.trackingUserLocation(item: Tracking(orderId: orderID, userId: settings.id ?? "", status: viewModel.order?.orderStatus?.rawValue ?? "", lat: location.latitude, lng: location.longitude, lastUpdate: Date().toMillis()))
+                } else {
+                    print("Failed to get the user's location")
+                }
+            }
+        }
+    }
+    
+    private func deleteAndstopUpdateDriverLocation() {
+        if let order = viewModel.order, order.user?._id == settings.id {
+            userViewModel.deleteUserLocation(id: orderID)
+            LocationManager.shared.stopUpdatingLocation()
+        }
+    }
+    
+    func observeDriverLocation() {
+        if !orderID.isEmpty {
+            userViewModel.observeDriverLocation(orderID: orderID) { tracking in
+                self.driverLocation = CLLocationCoordinate2D(latitude: tracking.lat, longitude: tracking.lng)
+            }
+        }
     }
 }

@@ -13,7 +13,7 @@ struct TransactionsRowiew: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 11) {
-                Image(item.paymentType == "Online" ? "ic_transfer_up" : "ic_transfer_down")
+                Image(item.type == .addition ? "ic_transfer_up" : "ic_transfer_down")
                     .resizable()
                     .frame(width: 20, height: 20)
                 VStack(alignment: .leading) {
@@ -38,6 +38,6 @@ struct TransactionsRowiew: View {
 }
 
 #Preview {
-    TransactionsRowiew(item: WalletData(id: nil, orderNo: nil, user: nil, details: nil, total: nil, paymentType: nil, createAt: nil))
+    TransactionsRowiew(item: WalletData(id: nil, orderNo: nil, user: nil, details: nil, total: nil, type: .addition, paymentType: nil, createAt: nil))
 }
 

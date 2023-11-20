@@ -10,6 +10,7 @@ import iPhoneNumberField
 import PopupView
 import FirebaseMessaging
 import MapKit
+import Combine
 
 struct RegisterView: View {
     @State var mobile: String = ""
@@ -18,13 +19,21 @@ struct RegisterView: View {
     @EnvironmentObject var settings: UserSettings
     @Environment(\.presentationMode) var presentationMode
     @StateObject var monitor = Monitor()
-    @State private var selectedRegion = "SA" // Default selected region
-    @State private var countryCode = "+966" // Default country code for Saudi Arabia
+//    @State private var selectedRegion = "SA" // Default selected region
+//    @State private var countryCode = "+966" // Default country code for Saudi Arabia
     @State var completePhoneNumber = ""
     @StateObject private var viewModel = AuthViewModel(errorHandling: ErrorHandling())
     @StateObject private var router: MainRouter
     @State private var userLocation: CLLocationCoordinate2D? = nil
     private let errorHandling = ErrorHandling()
+    @State var presentSheet = false
+    @FocusState private var keyIsFocused: Bool
+    @State var countryCode : String = "+966"
+    @State var countryFlag : String = "🇸🇦"
+    @State var countryPattern : String = "## ### ####"
+    @State var countryLimit : Int = 17
+    let counrties: [CPData] = Bundle.main.decode("CountryNumbers.json")
+    @State private var searchCountry: String = ""
 
     init(router: MainRouter) {
         _router = StateObject(wrappedValue: router)
@@ -56,21 +65,46 @@ struct RegisterView: View {
                         .customFont(weight: .book, size: 11)
                         .foregroundColor(.grayA4ACAD())
 
-                    iPhoneNumberField("000000000000", text: $mobile, isEditing: $isEditing)
-                        .flagHidden(false)
-                        .flagSelectable(true)
-                        .defaultRegion(selectedRegion)
-                        .formatted(true)
-                        .maximumDigits(12)
-                        .foregroundColor(.black141F1F())
-                        .clearButtonMode(.whileEditing)
-                        .onClear { _ in isEditing.toggle() }
-                        .customFont(weight: .book, size: 14)
-                        .accentColor(Color.primary())
-                        .disabled(viewModel.isLoading)
+                    HStack(spacing: 10) {
+                        Button {
+                            presentSheet = true
+                            keyIsFocused = false
+                        } label: {
+                            Text("\(countryFlag) \(countryCode)")
+                                .foregroundColor(.black141F1F())
+                        }
+
+                        TextField("", text: $mobile)
+                            .placeholder(when: mobile.isEmpty) {
+                                Text(LocalizedStringKey.phoneNumber)
+                                    .foregroundColor(.white)
+                            }
+                            .focused($keyIsFocused)
+                            .foregroundColor(.black141F1F())
+                            .keyboardType(.phonePad)
+                            .onReceive(Just(mobile)) { _ in
+                                applyPatternOnNumbers(&mobile, pattern: countryPattern, replacementCharacter: "#")
+                            }
+                    }
+                    .environment(\.layoutDirection, .leftToRight)
+                    
+//                    iPhoneNumberField("000000000000", text: $mobile, isEditing: $isEditing)
+//                        .flagHidden(false)
+//                        .flagSelectable(true)
+//                        .defaultRegion(selectedRegion)
+//                        .formatted(true)
+//                        .maximumDigits(12)
+//                        .foregroundColor(.black141F1F())
+//                        .clearButtonMode(.whileEditing)
+//                        .onClear { _ in isEditing.toggle() }
+//                        .customFont(weight: .book, size: 14)
+//                        .accentColor(Color.primary())
+//                        .disabled(viewModel.isLoading)
+//                        .environment(\.layoutDirection, .leftToRight)
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
+                .background(Color(red: 0.98, green: 0.98, blue: 0.98))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
                         .inset(by: 0.5)
@@ -106,15 +140,41 @@ struct RegisterView: View {
         .toolbarBackground(Color.white,for: .navigationBar)
 //        .toolbarBackground(.visible, for: .navigationBar)
         .dismissKeyboard()
+        .sheet(isPresented: $presentSheet) {
+            NavigationStack {
+                List(filteredResorts) { country in
+                    
+                    HStack {
+                        Text(country.flag)
+                        Text(country.name)
+                            .font(.headline)
+                        Spacer()
+                        Text(country.dial_code)
+                            .foregroundColor(.secondary)
+                    }
+                    .onTapGesture {
+                        self.countryFlag = country.flag
+                        self.countryCode = country.dial_code
+                        self.countryPattern = country.pattern
+                        self.countryLimit = country.limit
+                        presentSheet = false
+                        searchCountry = ""
+                    }
+                }
+                .listStyle(.plain)
+                .searchable(text: $searchCountry, prompt: LocalizedStringKey.yourCountry)
+            }
+            .environment(\.layoutDirection, .leftToRight)
+        }
         .onAppear {
             // Use the user's current location if available
             if let userLocation = LocationManager.shared.userLocation {
                 self.userLocation = userLocation
             }
             
-            #if DEBUG
-            mobile = "905345719207"
-            #endif
+//            #if DEBUG
+//            mobile = "905345719207"
+//            #endif
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
@@ -125,7 +185,36 @@ struct RegisterView: View {
     
     private func getCompletePhoneNumber() -> String {
         completePhoneNumber = "\(countryCode)\(mobile)".replacingOccurrences(of: " ", with: "")
+        
+        // Remove "+" from countryCode
+        if countryCode.hasPrefix("+") {
+            completePhoneNumber = completePhoneNumber.replacingOccurrences(of: countryCode, with: String(countryCode.dropFirst()))
+        }
+        
         return completePhoneNumber
+    }
+
+    var filteredResorts: [CPData] {
+        if searchCountry.isEmpty {
+            return counrties
+        } else {
+            return counrties.filter { $0.name.contains(searchCountry) }
+        }
+    }
+    
+    func applyPatternOnNumbers(_ stringvar: inout String, pattern: String, replacementCharacter: Character) {
+        var pureNumber = stringvar.replacingOccurrences( of: "[^0-9]", with: "", options: .regularExpression)
+        for index in 0 ..< pattern.count {
+            guard index < pureNumber.count else {
+                stringvar = pureNumber
+                return
+            }
+            let stringIndex = String.Index(utf16Offset: index, in: pattern)
+            let patternCharacter = pattern[stringIndex]
+            guard patternCharacter != replacementCharacter else { continue }
+            pureNumber.insert(patternCharacter, at: stringIndex)
+        }
+        stringvar = pureNumber
     }
 }
 
@@ -137,8 +226,9 @@ struct RegisterView: View {
 
 extension RegisterView {
     func register(fcmToken: String) {
+        print(getCompletePhoneNumber())
         let params = [
-            "phone_number": mobile,
+            "phone_number": getCompletePhoneNumber(),
             "os": "IOS",
             "fcmToken": fcmToken,
             "lat": userLocation?.latitude ?? 0.0,
@@ -146,7 +236,7 @@ extension RegisterView {
         ] as [String : Any]
         
         viewModel.registerUser(params: params, onsuccess: { id in
-            router.presentViewSpec(viewSpec: .smsVerification(id, mobile))
+            router.presentViewSpec(viewSpec: .smsVerification(id, getCompletePhoneNumber()))
         })
     }
 }

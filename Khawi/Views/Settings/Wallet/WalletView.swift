@@ -119,7 +119,7 @@ struct WalletView: View {
         .navigationTitle("")
         .navigationDestination(isPresented: $showAddBalanceView, destination: {
             AddBalanceView(showAddBalanceView: $showAddBalanceView, router: MainRouter(isPresented: .constant(.main)), onsuccess: {
-                loadData()
+                //
             })
         })
         .toolbar {

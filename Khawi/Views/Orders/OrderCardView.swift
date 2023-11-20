@@ -30,10 +30,10 @@ struct OrderCardView: View {
         ZStack {
             Text(item?.displayedOrderStatus?.displayedValue ?? "")
                 .customFont(weight: .book, size: 10)
-                .foregroundColor(item?.orderStatus == .new ? Color.blue0094FF() : item?.orderStatus == .finished ? .green0CB057() : item?.orderStatus == .rated ? .green0CB057() : .redFF3F3F())
+                .foregroundColor(item?.orderStatus == .new ? Color.blue0094FF() : item?.orderStatus == .accepted ? Color.blue0094FF() : item?.orderStatus == .started ? Color.blue0094FF() : item?.orderStatus == .finished ? .green0CB057() : item?.orderStatus == .rated ? .green0CB057() : .redFF3F3F())
                 .padding(.horizontal, item?.orderStatus == .new ? 12 : item?.orderStatus == .finished ? 25 : 27)
                 .padding(.vertical, 8)
-                .background((item?.orderStatus == .new ? Color.blue0094FF() : item?.orderStatus == .finished ? .green0CB057() : item?.orderStatus == .rated ? .green0CB057() : .redFF3F3F()).opacity(0.06).cornerRadius(12, corners: [.topLeft, .bottomRight]))
+                .background((item?.orderStatus == .new ? Color.blue0094FF() : item?.orderStatus == .accepted ? Color.blue0094FF() : item?.orderStatus == .started ? Color.blue0094FF() : item?.orderStatus == .finished ? .green0CB057() : item?.orderStatus == .rated ? .green0CB057() : .redFF3F3F()).opacity(0.06).cornerRadius(12, corners: [.topLeft, .bottomRight]))
                 .offset(x: 150, y: -60)
 
             Image(systemName: "arrow.left.circle.fill")

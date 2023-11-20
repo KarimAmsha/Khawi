@@ -165,3 +165,7 @@
 "Amount" = "Amount";
 "Exceeds Limits" = "Exceeds Limits";
 "Accepted Offers" = "Accepted Offers";
+"Invalid Token" = "Expired Token, Please login again";
+"Your country" = "Your country";
+"Coupon" = "Coupon";
+"Invite Friend" = "Invite Friend";

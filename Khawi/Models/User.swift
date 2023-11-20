@@ -11,7 +11,7 @@ struct User: Codable {
     let createAt: String?
     let isVerify: Bool?
     let isBlock: Bool?
-    let wallet: Int?
+    let wallet: Double?
     let _id: String?
     let full_name: String?
     let email: String?
@@ -34,12 +34,13 @@ struct User: Codable {
     let rate: Double?
     let orders: Int?
     let delivery_address: [DeliveryAddress]?
+    let by: String?
         
     init(fromDictionary dictionary: [String: Any]) {
         createAt = dictionary["createAt"] as? String ?? ""
         isVerify = dictionary["isVerify"] as? Bool ?? false
         isBlock = dictionary["isBlock"] as? Bool ?? false
-        wallet = dictionary["wallet"] as? Int ?? 0
+        wallet = dictionary["wallet"] as? Double ?? 0.0
         _id = dictionary["_id"] as? String ?? ""
         full_name = dictionary["full_name"] as? String ?? ""
         email = dictionary["email"] as? String ?? ""
@@ -70,6 +71,7 @@ struct User: Codable {
 
         orders = dictionary["orders"] as? Int ?? 0
         delivery_address = dictionary["delivery_address"] as? [DeliveryAddress] ?? []
+        by = dictionary["by"] as? String ?? ""
     }
 }
 
@@ -109,6 +111,7 @@ extension User: Hashable {
         hasher.combine(hasCar)
         hasher.combine(rate)
         hasher.combine(orders)
+        hasher.combine(by)
 
         // If `delivery_address` is not nil, include its hash value
         if let deliveryAddress = delivery_address {

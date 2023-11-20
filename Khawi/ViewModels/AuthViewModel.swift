@@ -12,6 +12,7 @@ import Alamofire
 
 class AuthViewModel: ObservableObject {
     @Published var user: User?
+    @Published var referal: Referal?
     @Published var loggedIn: Bool = false
     @Published var isLoading: Bool = false
     @Published var errorTitle: String = LocalizedStringKey.error
@@ -116,6 +117,40 @@ class AuthViewModel: ObservableObject {
             })
             .store(in: &cancellables)
     }
+    
+    func createReferal(onsuccess: @escaping () -> Void) {
+        guard let token = userSettings.token else {
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        let endpoint = DataProvider.Endpoint.createReferal(token: token)
+        
+        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<Referal>.self)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
+                }
+            }, receiveValue: { [weak self] (response: SingleAPIResponse<Referal>) in
+                if response.status {
+                    self?.referal = response.items
+                    self?.errorMessage = nil
+                    onsuccess()
+                } else {
+                    // Use the centralized error handling component
+                    self?.handleAPIError(.customError(message: response.message))
+                }
+                self?.isLoading = false
+            })
+            .store(in: &cancellables)
+    }
+
 
     func logoutUser(onsuccess: @escaping () -> Void) {
         guard let token = userSettings.token else {

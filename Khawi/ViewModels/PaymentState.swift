@@ -25,6 +25,7 @@ class PaymentState: ObservableObject {
     @Published var isFetchingMoreData = false
     @Published var pagination: Pagination?
     @Published var user: User?
+    @Published var coupon: Coupon?
     private var cancellables = Set<AnyCancellable>()
     
     init(errorHandling: ErrorHandling) {
@@ -60,6 +61,12 @@ class PaymentState: ObservableObject {
     
     // Simulated: Replace this method with actual PaymentSDKConfiguration initialization
     func simulatedPaymentConfiguration(amount: Double) -> PaymentSDKConfiguration {
+        let theme = PaymentSDKTheme.default
+        theme.logoImage = UIImage(named: "ic_logo")
+        theme.backgroundColor = .white
+        theme.buttonFontColor = .black
+        theme.backButtonColor = .black
+
         return PaymentSDKConfiguration(profileID: "88646",
                                        serverKey: "SZJN2DKWTG-JDHMTD6T2L-KZJKMN6GKH",
                                        clientKey: "C7KMQQ-R7BR6D-HN7DG7-KQKMRQ",
@@ -68,8 +75,8 @@ class PaymentState: ObservableObject {
                                        merchantCountryCode: "SA")
                 .cartDescription("Flowers")
                 .cartID("1234")
-                .screenTitle("payWithCard")
-                .theme(PaymentSDKTheme.default)
+                .screenTitle(LocalizedStringKey.addAccount)
+                .theme(theme)
                 .billingDetails(PaymentSDKBillingDetails(name: "John Smith",
                                          email: "email@test.com",
                                          phone: "+97311111111",
@@ -161,15 +168,46 @@ extension PaymentState {
                 case .failure(let error):
                     // Use the centralized error handling component
                     self.handleAPIError(error)
-                    print("yyyyyy \(error)")
                 }
             }, receiveValue: { [weak self] (response: SingleAPIResponse<User>) in
-                print("rrrrr \(response)")
                 if response.status {
                     self?.user = response.items // The user object
                     self?.handleUserData()
                     self?.errorMessage = nil
                     onsuccess(response.message)
+                } else {
+                    // Use the centralized error handling component
+                    self?.handleAPIError(.customError(message: response.message))
+                }
+                self?.isLoading = false
+            })
+            .store(in: &cancellables)
+    }
+    
+    func checkCoupon(params: [String: Any], onsuccess: @escaping () -> Void) {
+        guard let token = userSettings.token else {
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        let endpoint = DataProvider.Endpoint.checkCoupon(params: params, token: token)
+        
+        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<Coupon>.self)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
+                }
+            }, receiveValue: { [weak self] (response: SingleAPIResponse<Coupon>) in
+                if response.status {
+                    self?.coupon = response.items // The user object
+                    self?.errorMessage = nil
+                    onsuccess()
                 } else {
                     // Use the centralized error handling component
                     self?.handleAPIError(.customError(message: response.message))

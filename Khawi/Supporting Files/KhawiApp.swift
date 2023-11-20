@@ -8,6 +8,7 @@
 import SwiftUI
 import Firebase
 import FirebaseMessaging
+import FirebaseCrashlytics
 
 @main
 struct KhawiApp: App {
@@ -17,6 +18,7 @@ struct KhawiApp: App {
     @StateObject private var authViewModel = AuthViewModel(errorHandling: ErrorHandling())
     @StateObject private var userViewModel = UserViewModel(errorHandling: ErrorHandling())
     @StateObject private var settings = UserSettings.shared
+    @StateObject private var notificationHandler = NotificationHandler()
 
     init() {
         UserDefaults.standard.set([languageManager.currentLanguage.identifier], forKey: "AppleLanguages")
@@ -32,6 +34,7 @@ struct KhawiApp: App {
                 .environmentObject(appState)
                 .environmentObject(authViewModel)
                 .environmentObject(settings)
+                .environmentObject(notificationHandler)
                 .preferredColorScheme(.light)
         }
     }
@@ -41,6 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         configureNotifications(application)
+        Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(true)
         return true
     }
 
@@ -69,66 +73,17 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
 
         if let userInfo = response.notification.request.content.userInfo as? [String: Any] {
-            print("userInfo \(userInfo)")
-
-            if let notificationTypeRawValue = userInfo["notificationType"] as? Int,
-               let notificationType = NOTIFICATION_TYPE(rawValue: notificationTypeRawValue) {
-
-                switch notificationType {
-                case .ORDERS:
-                    // Handle orders notification
-                    handleOrdersNotification(userInfo)
-                case .COUPON:
-                    // Handle coupon notification
-                    handleCouponNotification(userInfo)
-                case .GENERAL:
-                    // Handle general notification
-                    handleGeneralNotification(userInfo)
-                }
-            }
-            
+            NotificationHandler.shared.handleRemoteNotification(userInfo: userInfo)
             completionHandler()
         }
-    }
-    
-    func handleOrdersNotification(_ userInfo: [AnyHashable: Any]) {
-        print("userInfo \(userInfo)")
-        // Extract relevant information from userInfo and take appropriate action
-    }
-
-    func handleCouponNotification(_ userInfo: [AnyHashable: Any]) {
-        // Extract relevant information from userInfo and take appropriate action
-    }
-
-    func handleGeneralNotification(_ userInfo: [AnyHashable: Any]) {
-        // Extract relevant information from userInfo and take appropriate action
     }
 }
 
 extension AppDelegate : MessagingDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        print("userInfo2 \(userInfo)")
-
-        if let notificationTypeRawValue = userInfo["notificationType"] as? Int,
-           let notificationType = NOTIFICATION_TYPE(rawValue: notificationTypeRawValue) {
-
-            switch notificationType {
-            case .ORDERS:
-                // Handle orders notification
-                handleOrdersNotification(userInfo)
-            case .COUPON:
-                // Handle coupon notification
-                handleCouponNotification(userInfo)
-            case .GENERAL:
-                // Handle general notification
-                handleGeneralNotification(userInfo)
-            }
-
-            completionHandler(UIBackgroundFetchResult.newData)
-        } else {
-            completionHandler(UIBackgroundFetchResult.noData)
-        }
+        NotificationHandler.shared.handleRemoteNotification(userInfo: userInfo)
+        completionHandler(UIBackgroundFetchResult.newData)
     }
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) { }

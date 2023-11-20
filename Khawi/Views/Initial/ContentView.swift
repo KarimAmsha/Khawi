@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import FirebaseDynamicLinks
 
 struct ContentView: View {
     @State var isActive: Bool = false
     @EnvironmentObject var settings: UserSettings
+    @EnvironmentObject var appState: AppState
     @StateObject private var router = MainRouter(isPresented: .constant(.main))
     @ObservedObject var monitor = Monitor()
 
@@ -46,6 +48,31 @@ struct ContentView: View {
                     self.isActive = true
                 }
             }
+            
+            checkForReferralLink()
+        }
+        .onOpenURL { url in
+            // User 2: Handle dynamic link when the app is opened by a URL
+            handleDynamicLink(url)
+        }
+    }
+    
+    private func handleDynamicLink(_ url: URL) {
+        guard let dynamicLink = DynamicLinks.dynamicLinks().dynamicLink(fromCustomSchemeURL: url) else {
+            return
+        }
+
+        if let referrerID = dynamicLink.url?.valueOf("referrerID") {
+            print("referrerID \(referrerID)")
+        }
+    }
+    
+    private func checkForReferralLink() {
+        // Check for an existing referral link when the app starts
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let url = windowScene.userActivity?.webpageURL {
+            appState.referalUrl = url
+            handleDynamicLink(url)
         }
     }
 }
@@ -53,5 +80,6 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environmentObject(UserSettings())
+        .environmentObject(AppState())
 }
 

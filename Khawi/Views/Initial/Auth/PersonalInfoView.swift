@@ -200,15 +200,20 @@ extension PersonalInfoView {
             "carNumber": carNumber
         ]
         
+        let dispatchGroup = DispatchGroup()
+        dispatchGroup.enter()
         if let userLocation = userLocation {
             Utilities.getAddress(for: userLocation) { address in
                 additionalParams["address"] = address
+                dispatchGroup.leave()
             }
         }
 
-        viewModel.updateUserDataWithImage(imageData: imageData, additionalParams: additionalParams) {
-            router.replaceNavigationStack(path: [])
-            settings.loggedIn = true
+        dispatchGroup.notify(queue: .main) {
+            viewModel.updateUserDataWithImage(imageData: imageData, additionalParams: additionalParams) {
+                router.replaceNavigationStack(path: [])
+                settings.loggedIn = true
+            }
         }
     }
 }

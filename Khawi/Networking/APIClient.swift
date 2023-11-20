@@ -23,6 +23,7 @@ class APIClient {
         case notFound
         case badRequest
         case serverError
+        case invalidToken
         case customError(message: String)
     }
 
@@ -174,7 +175,7 @@ extension APIClient {
 }
 
 extension APIClient {
-    private func decodeApiResponse<T: Decodable>(
+    private func decodeApiResponse2<T: Decodable>(
         response: AFDataResponse<Data?>,
         completion: @escaping (Result<T, APIError>) -> Void
     ) {
@@ -196,7 +197,7 @@ extension APIClient {
         }
     }
     
-    private func decodeApiResponse1<T: Decodable>(
+    private func decodeApiResponse<T: Decodable>(
         response: AFDataResponse<Data?>,
         completion: @escaping (Result<T, APIError>) -> Void
     ) {
@@ -219,6 +220,8 @@ extension APIClient {
                     completion(.failure(.unauthorized))
                 case 404:
                     completion(.failure(.notFound))
+                case 430:
+                    completion(.failure(.invalidToken))
                 case 500...599:
                     completion(.failure(.serverError))
                 default:

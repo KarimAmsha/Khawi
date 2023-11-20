@@ -72,8 +72,10 @@ class OrdersViewModel: ObservableObject {
                 case .failure(let error):
                     // Use the centralized error handling component
                     self.handleAPIError(error)
+                    print("ssss \(error.localizedDescription)")
                 }
             }, receiveValue: { [weak self] (response: SingleAPIResponse<OrderId>) in
+                print("response \(response)")
                 if response.status {
                     self?.orderId = response.items
                     self?.errorMessage = nil

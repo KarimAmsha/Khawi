@@ -36,6 +36,8 @@ enum APIEndpoint {
     case getWallet(page: Int?, limit: Int?, token: String)
     case addBalanceToWallet(params: [String: Any], token: String)
     case addComplain(params: [String: Any], token: String)
+    case createReferal(token: String)
+    case checkCoupon(params: [String: Any], token: String)
 
     // Define the base API URL
     private static let baseURL = Constants.baseURL
@@ -148,6 +150,10 @@ enum APIEndpoint {
             return "/mobile/user/wallet"
         case .addComplain:
             return "/mobile/constant/add-complain"
+        case .createReferal:
+            return "/mobile/user/referal"
+        case .checkCoupon:
+            return "/mobile/check/coupon"
         }
     }
     
@@ -155,7 +161,7 @@ enum APIEndpoint {
         switch self {
         case .getWelcome, .getConstants, .getUserProfile, .getConstantDetails, .map, .getOrders, .getOrderDetails, .getNotifications, .getWallet:
             return .get
-        case .register, .verify, .resend, .updateUserDataWithImage, .logout, .addOrder, .addOfferToOrder, .updateOfferStatus, .updateOrderStatus, .addReview, .deleteNotification, .addBalanceToWallet, .addComplain:
+        case .register, .verify, .resend, .updateUserDataWithImage, .logout, .addOrder, .addOfferToOrder, .updateOfferStatus, .updateOrderStatus, .addReview, .deleteNotification, .addBalanceToWallet, .addComplain, .createReferal, .checkCoupon:
             return .post
         }
     }
@@ -166,7 +172,7 @@ enum APIEndpoint {
             var headers = HTTPHeaders()
             headers.add(name: "Accept-Language", value: getUserPreferredLanguageCode() ?? "ar")
             return headers
-        case .getUserProfile(let token), .updateUserDataWithImage(_, _, let token), .logout(_, let token), .addOrder(_, let token), .map(_, let token), .addOfferToOrder(_, _, let token), .updateOfferStatus(_, _, let token), .updateOrderStatus(_, _, let token), .getOrders(_, _, _, token: let token), .getOrderDetails(_, let token), .addReview(_, _, let token), .getNotifications(_, _, let token), .deleteNotification(_, let token), .getWallet(_, _, let token), .addBalanceToWallet(_, let token), .addComplain(_ , let token):
+        case .getUserProfile(let token), .updateUserDataWithImage(_, _, let token), .logout(_, let token), .addOrder(_, let token), .map(_, let token), .addOfferToOrder(_, _, let token), .updateOfferStatus(_, _, let token), .updateOrderStatus(_, _, let token), .getOrders(_, _, _, token: let token), .getOrderDetails(_, let token), .addReview(_, _, let token), .getNotifications(_, _, let token), .deleteNotification(_, let token), .getWallet(_, _, let token), .addBalanceToWallet(_, let token), .addComplain(_ , let token), .createReferal(let token), .checkCoupon(_, let token):
             var headers = HTTPHeaders()
             headers.add(name: "Accept-Language", value: getUserPreferredLanguageCode() ?? "ar")
             headers.add(name: "token", value: token)
@@ -176,9 +182,9 @@ enum APIEndpoint {
     
     var parameters: [String: Any]? {
         switch self {
-        case .getWelcome, .getConstants, .getConstantDetails, .getUserProfile, .logout, .map, .getOrders, .getOrderDetails, .getNotifications, .deleteNotification, .getWallet:
+        case .getWelcome, .getConstants, .getConstantDetails, .getUserProfile, .logout, .map, .getOrders, .getOrderDetails, .getNotifications, .deleteNotification, .getWallet, .createReferal:
             return nil
-        case .register(let params), .verify(let params), .resend(let params), .updateUserDataWithImage(let params, _, _), .addOrder(let params, _), .addOfferToOrder(_, let params, _), .updateOfferStatus(_, let params, _), .updateOrderStatus(_, let params, _), .addReview(_, let params, _), .addBalanceToWallet(let params, _), .addComplain(let params, _):
+        case .register(let params), .verify(let params), .resend(let params), .updateUserDataWithImage(let params, _, _), .addOrder(let params, _), .addOfferToOrder(_, let params, _), .updateOfferStatus(_, let params, _), .updateOrderStatus(_, let params, _), .addReview(_, let params, _), .addBalanceToWallet(let params, _), .addComplain(let params, _), .checkCoupon(let params, _):
             return params
         }
     }

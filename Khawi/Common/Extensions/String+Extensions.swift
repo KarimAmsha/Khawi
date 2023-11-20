@@ -36,4 +36,21 @@ extension String {
 
         return result
     }
+    
+    static func randomStringWithDigitsAndChars(_ numberOfDigits: Int) -> String {
+        // Generate a random string with the specified length
+        let randomString = (0..<numberOfDigits).map { _ in
+            let isDigit = Bool.random()
+            if isDigit {
+                // Generate a random digit
+                return String(Int.random(in: 0...9))
+            } else {
+                // Generate a random uppercase letter
+                let randomUppercaseLetter = String(UnicodeScalar(Int.random(in: 65...90))!)
+                return randomUppercaseLetter
+            }
+        }.joined()
+
+        return randomString
+    }
 }

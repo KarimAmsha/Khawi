@@ -8,6 +8,10 @@
 import Foundation
 
 extension Date {
+    func toMillis() -> Int64! {
+        return Int64(self.timeIntervalSince1970)
+    }
+
     func toString(format: String) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format

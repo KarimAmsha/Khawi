@@ -58,6 +58,8 @@ struct OrdersView: View {
                 ForEach(ordersViewModel.orders, id: \.self) { item in
                     OrderCardView(item: item)
                         .onTapGesture {
+                            print("item.type \(item.orderType)")
+                            print("item.type \(item.type)")
                             if item.type == .joining {
                                 router.presentViewSpec(viewSpec: .joiningRequestOrderDetailsView(item._id ?? ""))
                             } else {

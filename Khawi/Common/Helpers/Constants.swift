@@ -19,6 +19,7 @@ struct Constants {
     static let dbRef                = Database.database().reference()
     static let usersRef             = dbRef.child("user")
     static let userLocationRef      = dbRef.child("userLocation")
+    static let trackingRef          = dbRef.child("tracking")
     static let messagesRef          = dbRef.child("messages")
     static let messagesList         = "messagesList"
     static let lastMessage          = "lastMessage"

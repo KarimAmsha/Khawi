@@ -12,27 +12,27 @@ struct NotificationRowView: View {
 
     var body: some View {
         VStack {
-//            if (notification.isFromAdmin ?? false) {
-//                HStack(alignment: .firstTextBaseline, spacing: 17) {
-//                    Circle()
-//                        .frame(width: 8, height: 8)
-//                        .foregroundColor(.primary())
-//                    VStack(alignment: .leading) {
-//                        Text(notification.title ?? "")
-//                            .customFont(weight: .book, size: 12)
-//                            .foregroundColor(.grayA4ACAD())
-//                        HStack {
-//                            Text(notification.message ?? "")
-//                                .customFont(weight: .book, size: 14)
-//                                .foregroundColor(.black141F1F())
-//                            Spacer()
-//                            Text(notification.date ?? "")
-//                                .customFont(weight: .book, size: 14)
-//                                .foregroundColor(.grayA4ACAD())
-//                        }
-//                    }
-//                }
-//            } else {
+            if notification.notificationType == .panel {
+                HStack(alignment: .firstTextBaseline, spacing: 17) {
+                    Circle()
+                        .frame(width: 8, height: 8)
+                        .foregroundColor(.primary())
+                    VStack(alignment: .leading) {
+                        Text(notification.title ?? "")
+                            .customFont(weight: .book, size: 12)
+                            .foregroundColor(.grayA4ACAD())
+                        HStack {
+                            Text(notification.message ?? "")
+                                .customFont(weight: .book, size: 14)
+                                .foregroundColor(.black141F1F())
+                            Spacer()
+                            Text(notification.formattedDate ?? "")
+                                .customFont(weight: .book, size: 14)
+                                .foregroundColor(.grayA4ACAD())
+                        }
+                    }
+                }
+            } else {
                 HStack(spacing: 15) {
                     Image(notification.notificationType == .join ? "ic_new_notification" : "ic_agree_notification")
                         .resizable()
@@ -65,7 +65,7 @@ struct NotificationRowView: View {
                         }
                     }
                 }
-//            }
+            }
             
             CustomDivider()
         }

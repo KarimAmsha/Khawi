@@ -37,6 +37,8 @@ class DataProvider {
         case getWallet(page: Int?, limit: Int?, token: String)
         case addBalanceToWallet(params: [String: Any], token: String)
         case addComplain(params: [String: Any], token: String)
+        case createReferal(token : String)
+        case checkCoupon(params: [String: Any], token: String)
 
         // Map your custom Endpoint to APIEndpoint
         func toAPIEndpoint() -> APIEndpoint {
@@ -85,6 +87,10 @@ class DataProvider {
                 return .addBalanceToWallet(params: params, token: token)
             case .addComplain(let params, let token):
                 return .addComplain(params: params, token: token)
+            case .createReferal(let token):
+                return .createReferal(token: token)
+            case .checkCoupon(let params, let token):
+                return .checkCoupon(params: params, token: token)
             }
         }
     }

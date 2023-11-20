@@ -55,7 +55,8 @@ struct SMSVerificationView: View {
                     .disabled(viewModel.isLoading)
                 Spacer()
             }
-            
+            .environment(\.layoutDirection, .leftToRight)
+
             Button {
                 verify()
             } label: {
@@ -105,10 +106,16 @@ struct SMSVerificationView_Previews: PreviewProvider {
 
 extension SMSVerificationView {
     private func verify() {
+        var lastPathComponent = ""
+        if let referalUrl = appState.referalUrl {
+            lastPathComponent = referalUrl.lastPathComponent
+        }
+
         let params = [
             "id": id,
             "verify_code": code,
-            "phone_number": mobile
+            "phone_number": mobile,
+            "by": lastPathComponent
         ] as [String : Any]
 
         viewModel.verify(params: params) { profileCompleted in

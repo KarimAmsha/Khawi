@@ -13,6 +13,7 @@ struct WalletData: Identifiable, Codable, Hashable  {
     let user: User?
     let details: String?
     let total: Int?
+    let type: TransactionType? 
     let paymentType: String?
     let createAt: String?
     
@@ -22,6 +23,7 @@ struct WalletData: Identifiable, Codable, Hashable  {
         case user
         case details
         case total
+        case type
         case paymentType
         case createAt
     }

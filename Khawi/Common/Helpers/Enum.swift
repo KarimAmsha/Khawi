@@ -149,8 +149,8 @@ enum OrderStatus: String, Codable {
     var displayedValue: String {
         switch self {
         case .new: return LocalizedStringKey.openedOrder
-        case .accepted: return LocalizedStringKey.accepted
-        case .started: return LocalizedStringKey.started
+        case .accepted: return LocalizedStringKey.openedOrder
+        case .started: return LocalizedStringKey.openedOrder
         case .finished: return LocalizedStringKey.completed
         case .canceled: return LocalizedStringKey.canceledOrder
         case .canceledByDriver: return LocalizedStringKey.canceledByDriver
@@ -200,16 +200,24 @@ enum PointType {
     case user
 }
 
+// Define the enum for the 'type' property
+enum TransactionType: String, Codable {
+    case addition = "+"
+    case subtraction = "-"
+}
+
 enum NotificationType: String, Codable {
     case join = "1"
     case deliver = "2"
-    
+    case panel = "3"
+
     init(_ type: String) {
         switch type {
         case "1": self = .join
         case "2": self = .deliver
+        case "3": self = .panel
         default:
-            self = .join
+            self = .panel
         }
     }
 }
@@ -369,6 +377,9 @@ enum LocalizedStringKey {
     static let amount = "Amount".localized
     static let exceedsLimits = "Exceeds Limits".localized
     static let acceptedOffers = "Accepted Offers".localized
+    static let yourCountry = "Your country".localized
+    static let coupon = "Coupon".localized
+    static let inviteFriend = "Invite Friend".localized
 }
 
 enum LocalizedError {
@@ -382,5 +393,6 @@ enum LocalizedError {
     static let invalidData = "Invalid data received.".localized
     static let decodingError = "Decoding error".localized
     static let invalidURL = "Invalid URL".localized
+    static let invalidToken = "Invalid Token".localized
     static let responseValidationFailed = "Response validation failed".localized
 }

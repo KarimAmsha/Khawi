@@ -28,3 +28,14 @@ extension URL {
 
     }
 }
+
+extension URL {
+    func valueOf(_ queryParameterName: String) -> String? {
+        guard let urlComponents = URLComponents(url: self, resolvingAgainstBaseURL: false),
+              let queryItems = urlComponents.queryItems else {
+            return nil
+        }
+
+        return queryItems.first(where: { $0.name == queryParameterName })?.value
+    }
+}
