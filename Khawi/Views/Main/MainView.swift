@@ -12,6 +12,7 @@ struct MainView: View {
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var settings: UserSettings
     @State var showPopUp = false
+    @StateObject var notificationsViewModel = NotificationsViewModel(errorHandling: ErrorHandling())
     @StateObject private var router: MainRouter
     
     init(router: MainRouter) {
@@ -43,7 +44,23 @@ struct MainView: View {
                         ZStack {
                             if showPopUp {
                                 PlusMenu(widthAndHeight: 47, appState: appState, showPopUp: $showPopUp, onJoiningRequest: {
-                                    router.presentViewSpec(viewSpec: .newJoinRequest)
+                                    if settings.user?.hasCar ?? true {
+                                        router.presentViewSpec(viewSpec: .newJoinRequest)
+                                    } else {
+                                        let alertModel = AlertModel(
+                                            title: LocalizedStringKey.message,
+                                            message: LocalizedStringKey.youDontHaveCar,
+                                            hideCancelButton: true,
+                                            onOKAction: {
+                                                router.dismiss()
+                                            },
+                                            onCancelAction: {
+                                                router.dismiss()
+                                            }
+                                        )
+                                        
+                                        router.presentToastPopup(view: .alert(alertModel))
+                                    }
                                 }, onDeliveryRequest: {
                                     router.presentViewSpec(viewSpec: .newDeliveryRequest)
                                 })
@@ -83,10 +100,17 @@ struct MainView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .accentColor(.black)
+        .onAppear {
+            // Update the notification count when the view appears
+            notificationsViewModel.notificationCount { message, count in
+                appState.notificationCountString = count
+            }
+        }
     }
 }
 
 #Preview {
     MainView(router: MainRouter(isPresented: .constant(.main)))
         .environmentObject(UserSettings())
+        .environmentObject(AppState())
 }

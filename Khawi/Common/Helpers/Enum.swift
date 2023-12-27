@@ -207,15 +207,13 @@ enum TransactionType: String, Codable {
 }
 
 enum NotificationType: String, Codable {
-    case join = "1"
-    case deliver = "2"
-    case panel = "3"
+    case orders = "1"
+    case panel = "2"
 
     init(_ type: String) {
         switch type {
-        case "1": self = .join
-        case "2": self = .deliver
-        case "3": self = .panel
+        case "1": self = .orders
+        case "2": self = .panel
         default:
             self = .panel
         }
@@ -335,6 +333,7 @@ enum LocalizedStringKey {
     static let sar = "SAR".localized
     static let finicialTransactions = "Finicial Transactions".localized
     static let addAccount = "Add Account".localized
+    static let tripTitleOptional = "Trip Title Optional".localized
     static let tripTitle = "Trip Title".localized
     static let firstTripDate = "First Trip Date".localized
     static let maxPassengersNumber = "Maximum number of passengers per flight".localized
@@ -380,6 +379,16 @@ enum LocalizedStringKey {
     static let yourCountry = "Your country".localized
     static let coupon = "Coupon".localized
     static let inviteFriend = "Invite Friend".localized
+    static let carFrontImage = "Car Front Image".localized
+    static let carBackImage = "Car Back Image".localized
+    static let carRightImage = "Car Right Image".localized
+    static let carLeftImage = "Car Left Image".localized
+    static let identityImage = "Identity Image".localized
+    static let licenseImage = "License Image".localized
+    static let youDontHaveCar = "You don't have a car".localized
+    static let approvedSoon = "Your account will be approved soon".localized
+    static let callInfo = "Call Info".localized
+    static let clickToCall = "Click to call".localized
 }
 
 enum LocalizedError {

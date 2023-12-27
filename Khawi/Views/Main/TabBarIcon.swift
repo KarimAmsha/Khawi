@@ -41,11 +41,22 @@ struct TabBarIcon: View {
                 HStack{
                     Spacer()
                     VStack(spacing: 2) {
-                        Image(iconName)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(appState.currentPage == assignedPage ? Color.primary() : Color.black666666())
+                        ZStack {
+                            if assignedPage == .notifications {
+                                Text("\(appState.notificationCountString ?? "")")
+                                    .customFont(weight: .book, size: 12)
+                                    .foregroundColor(.white)
+                                    .padding(4)
+                                    .background(Circle().fill(Color.red))
+                                    .offset(x: 10, y: -10)
+                                    .opacity(appState.notificationCountString == nil || appState.notificationCountString?.toInt() == 0 ? 0 : 1)
+                            }
+                            Image(iconName)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(appState.currentPage == assignedPage ? Color.primary() : Color.black666666())
+                        }
                         Text(tabName)
                             .customFont(weight: .book, size: 12)
                             .foregroundColor(appState.currentPage == assignedPage ? Color.primary() : Color.black666666())

@@ -27,11 +27,22 @@ struct HomeView: View {
     @ObservedObject var ordersViewModel: OrdersViewModel
     @ObservedObject var userViewModel: UserViewModel
     @StateObject private var notificationHandler = NotificationHandler.shared
-
+    @StateObject private var mapSearch = MapSearch()
+    
+    @FocusState private var isFocused: Bool
+    
+    @State private var btnHover = false
+    @State private var isBtnActive = false
+    
+    @State private var address = ""
+    @State private var city = ""
+    @State private var state = ""
+    @State private var zip = ""
+    
     init(showPopUp: Binding<Bool>, router: MainRouter) {
         _showPopUp = showPopUp
         _router = StateObject(wrappedValue: router)
-
+        
         let initialRegion: MKCoordinateRegion
         if let userLocation = LocationManager.shared.userLocation {
             initialRegion = MKCoordinateRegion(
@@ -45,20 +56,56 @@ struct HomeView: View {
                 span: MKCoordinateSpan(latitudeDelta: 2.0, longitudeDelta: 2.0)
             )
         }
-
+        
         self._ordersViewModel = ObservedObject(wrappedValue: OrdersViewModel(initialRegion: initialRegion, errorHandling: errorHandling))
         self._userViewModel = ObservedObject(wrappedValue: UserViewModel(errorHandling: errorHandling))
     }
-
+    
     var body: some View {
         VStack(spacing: 0) {
             VStack {
-                SearchBar(text: $searchText, placeholder: LocalizedStringKey.searchForPlace)
+                SearchBar(text: $mapSearch.searchTerm, placeholder: LocalizedStringKey.searchForPlace)
             }
             .padding()
             .background(showPopUp ? .clear : Color.white)
             .cornerRadius(16)
             .shadow(color: Color.black.opacity(0.06), radius: 2, x: 0, y: 2)
+
+            if mapSearch.isListVisible && !mapSearch.locationResults.isEmpty {
+                ScrollView {
+                    // Autocomplete results
+                    ForEach(mapSearch.locationResults, id: \.self) { location in
+                        Button {
+                            mapSearch.searchTerm = location.title
+                            mapSearch.clearResults()
+                            handleAutocompleteSelection(location: location)
+                            // Hide the list after selecting a location
+                            mapSearch.isListVisible = false
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack {
+                                    Text(location.title)
+                                        .foregroundColor(.primary)
+                                        .font(.headline)
+                                    Spacer()
+                                }
+                                Text(location.subtitle)
+                                    .foregroundColor(.secondary)
+                                    .font(.caption)
+                                    .padding(.top, 2) // Adjust the top padding as needed
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+
+                        // Separator
+                        if mapSearch.locationResults.last != location {
+                            Divider().padding(.vertical, 4)
+                        }
+                    }
+                    .listRowSeparator(.visible)
+                }
+                .padding()
+            }
 
             Map(coordinateRegion: $region, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: generateMapAnnotations(for: ordersViewModel.nearByOrders)) { item in
                 MapAnnotation(coordinate: item.coordinate,
@@ -78,7 +125,7 @@ struct HomeView: View {
                         region.center = userLocation
                     }
                 }
-
+                
                 // Initial data loading
                 ordersViewModel.loadNearbyOrders(for: region.center)
             }
@@ -89,16 +136,16 @@ struct HomeView: View {
                         let oldLocation = CLLocation(latitude: lastCenter.latitude, longitude: lastCenter.longitude)
                         let newLocation = CLLocation(latitude: newCenter.latitude, longitude: newCenter.longitude)
                         let distance = newLocation.distance(from: oldLocation)
-//                        print("distance \(distance)")
-//                        print("distanceThreshold \(distanceThreshold)")
-
-//                        if distance >= distanceThreshold {
-                            withAnimation {
-//                                print("newCenter \(newCenter)")
-                                ordersViewModel.loadNearbyOrders(for: newCenter)
-                                lastLoadedRegion = MKCoordinateRegion(center: newCenter, span: region.span)
-                            }
-//                        }
+                        //                        print("distance \(distance)")
+                        //                        print("distanceThreshold \(distanceThreshold)")
+                        
+                        //                        if distance >= distanceThreshold {
+                        withAnimation {
+                            //                                print("newCenter \(newCenter)")
+                            ordersViewModel.loadNearbyOrders(for: newCenter)
+                            lastLoadedRegion = MKCoordinateRegion(center: newCenter, span: region.span)
+                        }
+                        //                        }
                     } else {
                         withAnimation {
                             lastLoadedRegion = MKCoordinateRegion(center: newCenter, span: region.span)
@@ -112,6 +159,14 @@ struct HomeView: View {
                         withAnimation {
                             region.center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
                         }
+                    }
+                }
+            }
+            .onChange(of: mapSearch.selectedLocation) { newLocation in
+                if let newLocation = newLocation {
+                    // Move the map to the selected place
+                    withAnimation {
+                        region.center = newLocation.placemark.coordinate
                     }
                 }
             }
@@ -180,7 +235,7 @@ struct HomeView: View {
             }
         }
     }
-        
+    
     func image(for type: OrderType) -> Image {
         switch type {
         case .joining:
@@ -190,7 +245,6 @@ struct HomeView: View {
         }
     }
 }
-
 
 #Preview {
     HomeView(showPopUp: .constant(false), router: MainRouter(isPresented: .constant(.main)))
@@ -231,4 +285,49 @@ extension HomeView {
             }
         }
     }    
+}
+
+
+extension HomeView {
+    private func handleAutocompleteSelection(location: MKLocalSearchCompletion) {
+        // Use MKLocalSearch to get detailed information about the selected location
+        let searchRequest = MKLocalSearch.Request(completion: location)
+        let search = MKLocalSearch(request: searchRequest)
+
+        search.start { response, error in
+            guard let mapItem = response?.mapItems.first else {
+                if let error = error {
+                    print("Error getting details for selected location: \(error.localizedDescription)")
+                }
+                return
+            }
+
+            // Handle the selected location (mapItem) as needed
+            // For example, update the selectedLocation in MapSearch
+            mapSearch.selectedLocation = mapItem
+        }
+    }
+    
+//    private func reverseGeo(location: MKLocalSearchCompletion) {
+//        let searchRequest = MKLocalSearch.Request(completion: location)
+//        let search = MKLocalSearch(request: searchRequest)
+//
+//        search.start { response, error in
+//            guard let mapItem = response?.mapItems.first else {
+//                let errorString = error?.localizedDescription ?? "Unexpected Error"
+//                print("Unable to reverse geocode the given location. Error: \(errorString)")
+//                return
+//            }
+//
+//            let reversedGeoLocation = ReversedGeoLocation(with: mapItem.placemark)
+//            address = reversedGeoLocation.streetName
+//            city = reversedGeoLocation.city
+//            state = reversedGeoLocation.state
+//            zip = reversedGeoLocation.zipCode
+//
+//            // Update your UI or perform actions with the reversed location
+//            print("Reversed Geo Location: \(reversedGeoLocation.formattedAddress)")
+//            isFocused = false
+//        }
+//    }
 }

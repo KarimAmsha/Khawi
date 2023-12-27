@@ -11,8 +11,7 @@ import MapKit
 struct NewJoiningRequestView: View {
     @StateObject private var router: MainRouter
     @State private var title = ""
-    @State private var minPrice = ""
-    @State private var maxPrice = ""
+    @State private var price = ""
     @State private var isDailyTrip = false
     @State private var note = ""
     @EnvironmentObject var appState: AppState
@@ -39,7 +38,7 @@ struct NewJoiningRequestView: View {
         GeometryReader { geometry in
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 16) {
-                    CustomTextField(text: $title, placeholder: LocalizedStringKey.tripTitle, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
+                    CustomTextField(text: $title, placeholder: LocalizedStringKey.tripTitleOptional, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
                         .disabled(ordersViewModel.isLoading)
 
                     Button {
@@ -75,12 +74,12 @@ struct NewJoiningRequestView: View {
                     .disabled(ordersViewModel.isLoading)
 
                     HStack(spacing: 12) {
-                        CustomTextField(text: $minPrice, placeholder: LocalizedStringKey.minPrice, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
+                        CustomTextField(text: $price, placeholder: LocalizedStringKey.price, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
                             .keyboardType(.numberPad)
                             .disabled(ordersViewModel.isLoading)
-                        CustomTextField(text: $maxPrice, placeholder: LocalizedStringKey.maxPrice, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
-                            .keyboardType(.numberPad)
-                            .disabled(ordersViewModel.isLoading)
+//                        CustomTextField(text: $maxPrice, placeholder: LocalizedStringKey.maxPrice, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
+//                            .keyboardType(.numberPad)
+//                            .disabled(ordersViewModel.isLoading)
                     }
                     
                     Button {
@@ -302,6 +301,12 @@ struct NewJoiningRequestView: View {
     }
 
     func destinationSelected() -> Bool {
+        if title.isEmpty, let endPoint = appState.endPoint {
+            Utilities.getShortAddress(for: endPoint.coordinate) { address in
+                title = address
+            }
+        }
+
         return appState.startPoint != nil && appState.endPoint != nil
     }
 
@@ -327,9 +332,9 @@ extension NewJoiningRequestView {
             "dt_date": dateStr,
             "dt_time": timeStr,
             "title": title,
-            "max_price": maxPrice.toInt() ?? 0,
-            "min_price": minPrice.toInt() ?? 0,
-            "price": maxPrice.toInt() ?? 0,
+            "max_price": price.toInt() ?? 0,
+            "min_price": price.toInt() ?? 0,
+            "price": price.toInt() ?? 0,
             "is_repeated": isDailyTrip,
             "days": selectedDays,
             "orderType": 1,

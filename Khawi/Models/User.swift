@@ -10,6 +10,7 @@ import Foundation
 struct User: Codable {
     let createAt: String?
     let isVerify: Bool?
+    let isApprove: Bool?
     let isBlock: Bool?
     let wallet: Double?
     let _id: String?
@@ -35,10 +36,17 @@ struct User: Codable {
     let orders: Int?
     let delivery_address: [DeliveryAddress]?
     let by: String?
-        
+    let carFrontImage: String?
+    let carBackImage: String?
+    let carRightImage: String?
+    let carLeftImage: String?
+    let identityImage: String?
+    let licenseImage: String?
+
     init(fromDictionary dictionary: [String: Any]) {
         createAt = dictionary["createAt"] as? String ?? ""
         isVerify = dictionary["isVerify"] as? Bool ?? false
+        isApprove = dictionary["isApprove"] as? Bool ?? false
         isBlock = dictionary["isBlock"] as? Bool ?? false
         wallet = dictionary["wallet"] as? Double ?? 0.0
         _id = dictionary["_id"] as? String ?? ""
@@ -72,6 +80,12 @@ struct User: Codable {
         orders = dictionary["orders"] as? Int ?? 0
         delivery_address = dictionary["delivery_address"] as? [DeliveryAddress] ?? []
         by = dictionary["by"] as? String ?? ""
+        carFrontImage = dictionary["carFrontImage"] as? String ?? ""
+        carBackImage = dictionary["carBackImage"] as? String ?? ""
+        carRightImage = dictionary["carRightImage"] as? String ?? ""
+        carLeftImage = dictionary["carLeftImage"] as? String ?? ""
+        identityImage = dictionary["identityImage"] as? String ?? ""
+        licenseImage = dictionary["licenseImage"] as? String ?? ""
     }
 }
 
@@ -88,6 +102,7 @@ extension User: Hashable {
         // Combine hash values for all properties
         hasher.combine(createAt)
         hasher.combine(isVerify)
+        hasher.combine(isApprove)
         hasher.combine(isBlock)
         hasher.combine(wallet)
         hasher.combine(_id)

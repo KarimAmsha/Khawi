@@ -21,6 +21,7 @@ class NotificationsViewModel: ObservableObject {
     @Published var totalPages = 1
     @Published var isFetchingMoreData = false
     @Published var pagination: Pagination?
+    @Published var notificationCountString: String?
 
     init(errorHandling: ErrorHandling) {
         self.errorHandling = errorHandling
@@ -85,7 +86,14 @@ class NotificationsViewModel: ObservableObject {
         fetchNotificationsItems(page: currentPage, limit: limit)
     }
     
-    func deleteNotifications(id: String, onsuccess: @escaping (String) -> Void) {
+    func formatNotificationCount(_ count: Int) -> String {
+        let englishFormatter = NumberFormatter()
+        englishFormatter.numberStyle = .decimal
+        englishFormatter.locale = Locale(identifier: "en_US")
+        return englishFormatter.string(from: NSNumber(value: count)) ?? ""
+    }
+
+    func notificationCount(onsuccess: @escaping (String, String?) -> Void) {
         guard let token = userSettings.token else {
             self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
             return
@@ -93,7 +101,44 @@ class NotificationsViewModel: ObservableObject {
 
         isLoading = true
         errorMessage = nil
-        let endpoint = DataProvider.Endpoint.deleteNotification(id: id, token: token)
+        let endpoint = DataProvider.Endpoint.notificationCount(token: token)
+        
+        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<Int>.self)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
+                }
+            }, receiveValue: { [weak self] (response: SingleAPIResponse) in
+                if response.status {
+                    self?.errorMessage = nil
+                    if let count = response.items {
+                        // Format the count using the new function
+                        let formattedCount = self?.formatNotificationCount(count) ?? ""
+                        self?.notificationCountString = formattedCount
+                        onsuccess(response.message, formattedCount)
+                    }
+                } else {
+                    // Use the centralized error handling component
+                    self?.handleAPIError(.customError(message: response.message))
+                }
+                self?.isLoading = false
+            })
+            .store(in: &cancellables)
+    }
+
+    func readNotifications(onsuccess: @escaping (String) -> Void) {
+        guard let token = userSettings.token else {
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        let endpoint = DataProvider.Endpoint.readNotification(token: token)
         
         DataProvider.shared.request(endpoint: endpoint, responseType: APIResponseCodable.self)
             .sink(receiveCompletion: { completion in

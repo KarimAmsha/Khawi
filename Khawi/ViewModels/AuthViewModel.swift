@@ -59,7 +59,7 @@ class AuthViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func verify(params: [String: Any], onsuccess: @escaping (Bool) -> Void) {
+    func verify(params: [String: Any], onsuccess: @escaping (Bool, Bool) -> Void) {
         isLoading = true
         errorMessage = nil
         let endpoint = DataProvider.Endpoint.verify(params: params)
@@ -79,7 +79,7 @@ class AuthViewModel: ObservableObject {
                     self?.handleVerificationStatus(isVerified: response.items?.isVerify ?? false)
                     self?.errorMessage = nil
                     let profileCompleted = !(self?.user?.full_name?.isEmpty ?? false)
-                    onsuccess(profileCompleted)
+                    onsuccess(profileCompleted, response.items?.isApprove ?? false)
                 } else {
                     // Use the centralized error handling component
                     self?.handleAPIError(.customError(message: response.message))
@@ -205,16 +205,24 @@ extension AuthViewModel {
         let errorDescription = errorHandling.handleAPIError(error)
         errorMessage = errorDescription
     }
-    
+        
     func handleVerificationStatus(isVerified: Bool) {
-        if isVerified {
-            // User is verified
-            if let user = self.user {
-                UserSettings.shared.login(user: user, id: user._id ?? "", token: user.token ?? "")
-            }
-        } else {
-            // User is not verified
+        guard isVerified, let user = self.user else {
+            // User is not verified or user data is nil
             errorMessage = nil
+            return
+        }
+
+        let isUserVerified = user.isVerify ?? false
+        let isUserApproved = user.isApprove ?? false
+
+        if isUserVerified && isUserApproved {
+            // User is both verified and approved
+            UserSettings.shared.login(user: user, id: user._id ?? "", token: user.token ?? "")
+        } else {
+            // User is either not verified or not approved
+            UserSettings.shared.registerToken(token: user.token ?? "")
         }
     }
+
 }

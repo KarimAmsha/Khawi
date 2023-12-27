@@ -95,14 +95,14 @@ struct JoiningRequestOrderDetailsView: View {
                                     // Show accepted offers
                                     ScrollView(showsIndicators: false) {
                                         ForEach(acceptedOffers, id: \.self) { item in
-                                            RequestsRowView(item: item, type: .delivery, settings: settings, onSelectDetails: {
-                                                if let order = viewModel.order {
-                                                    router.presentViewSpec(viewSpec: .showOfferDetails(order, item))
+                                            RequestsRowView(item: item, type: .delivery, settings: settings, onSelectAccept: {
+                                                withAnimation {
+                                                    updateOfferStatus(offer: item, status: .acceptOffer)
                                                 }
-                                            }, onSelectAttend: {
-                                                updateOfferStatus(offer: item, status: .attend)
-                                            }, onSelectNotAttend: {
-                                                updateOfferStatus(offer: item, status: .notAttend)
+                                            }, onSelectReject: {
+                                                withAnimation {
+                                                    updateOfferStatus(offer: item, status: .rejectOffer)
+                                                }
                                             })
                                         }
                                     }
@@ -119,14 +119,10 @@ struct JoiningRequestOrderDetailsView: View {
                                     
                                     ScrollView(showsIndicators: false) {
                                         ForEach(otherOffers, id: \.self) { item in
-                                            RequestsRowView(item: item, type: .delivery, settings: settings, onSelectDetails: {
-                                                if let order = viewModel.order {
-                                                    router.presentViewSpec(viewSpec: .showOfferDetails(order, item))
-                                                }
-                                            }, onSelectAttend: {
-                                                updateOfferStatus(offer: item, status: .attend)
-                                            }, onSelectNotAttend: {
-                                                updateOfferStatus(offer: item, status: .notAttend)
+                                            RequestsRowView(item: item, type: .delivery, settings: settings, onSelectAccept: {
+                                                updateOfferStatus(offer: item, status: .acceptOffer)
+                                            }, onSelectReject: {
+                                                updateOfferStatus(offer: item, status: .rejectOffer)
                                             })
                                         }
                                     }
@@ -375,6 +371,12 @@ struct JoiningRequestOrderDetailsView: View {
                         }
                     }
                     
+                    if let order = viewModel.order,
+                       let driverUser = order.user,
+                       settings.id != driverUser._id {
+                        JoinCallInfoView(order: order)
+                    }
+
                     VStack(alignment: .leading, spacing: 16) {
                         Text(LocalizedStringKey.driverNotes)
                             .customFont(weight: .book, size: 14)
@@ -406,7 +408,9 @@ struct JoiningRequestOrderDetailsView: View {
                             if settings.id == user._id {
                                 if offers.contains(where: { $0.status == "accept_offer" }) && order.orderStatus == .new {
                                     Button {
-                                        updateOrderStatus(status: .accepted)
+                                        withAnimation {
+                                            updateOrderStatus(status: .accepted)
+                                        }
                                     } label: {
                                         Text(LocalizedStringKey.accept)
                                     }
@@ -414,8 +418,10 @@ struct JoiningRequestOrderDetailsView: View {
                                 } else if order.orderStatus == .accepted {
                                     // Handle started status
                                     Button {
-                                        updateOrderStatus(status: .started)
-                                        fetchAndTrackingDriverLocation()
+                                        withAnimation {
+                                            updateOrderStatus(status: .started)
+                                            fetchAndTrackingDriverLocation()
+                                        }
                                     } label: {
                                         Text(LocalizedStringKey.start)
                                     }
@@ -423,8 +429,10 @@ struct JoiningRequestOrderDetailsView: View {
                                 } else if order.orderStatus == .started {
                                     // Handle finished status
                                     Button {
-                                        updateOrderStatus(status: .finished)
-                                        deleteAndstopUpdateDriverLocation()
+                                        withAnimation {
+                                            updateOrderStatus(status: .finished)
+                                            deleteAndstopUpdateDriverLocation()
+                                        }
                                     } label: {
                                         Text(LocalizedStringKey.finish)
                                     }
@@ -447,7 +455,8 @@ struct JoiningRequestOrderDetailsView: View {
                                 if !userHasOffer {
                                     // Present the "Join Now" button
                                     Button {
-                                        router.presentViewSpec(viewSpec: .joiningToTripView(order))
+                                        join()
+//                                        router.presentViewSpec(viewSpec: .joiningToTripView(order))
                                     } label: {
                                         Text(LocalizedStringKey.joinNow)
                                     }
@@ -486,6 +495,21 @@ struct JoiningRequestOrderDetailsView: View {
             if let errorMessage = errorMessage {
                 router.presentToastPopup(view: .error("", errorMessage))
             }
+        }
+    }
+    
+    func makeCall(phoneNumber: String) {
+        // Add "+" to the phone number
+        let phoneNumberWithPlus = "+\(phoneNumber)"
+
+        // Remove non-numeric characters from the phone number
+        let cleanedPhoneNumber = phoneNumberWithPlus.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+
+        if let phoneURL = URL(string: "tel://\(cleanedPhoneNumber)"),
+           UIApplication.shared.canOpenURL(phoneURL) {
+            UIApplication.shared.open(phoneURL, options: [:], completionHandler: nil)
+        } else {
+            print("Error: Unable to initiate the phone call.")
         }
     }
 }
@@ -573,6 +597,60 @@ extension JoiningRequestOrderDetailsView {
             userViewModel.observeDriverLocation(orderID: orderID) { tracking in
                 self.driverLocation = CLLocationCoordinate2D(latitude: tracking.lat, longitude: tracking.lng)
             }
+        }
+    }
+}
+
+extension JoiningRequestOrderDetailsView {
+    func join() {
+        guard let order = viewModel.order else {
+            // Handle the case where order is nil
+            return
+        }
+
+        let params: [String: Any] = [:]
+
+        viewModel.addOfferToOrder(orderId: order.id ?? "", params: params) { message in
+            router.replaceNavigationStack(path: [])
+            router.presentToastPopup(view: .joiningSuccess(order.id ?? "", message))
+        }
+    }
+}
+
+struct JoinCallInfoView: View {
+    let order: Order
+
+    var phoneNumber: String {
+        order.user?.phone_number ?? ""
+    }
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(LocalizedStringKey.callInfo)
+                .customFont(weight: .book, size: 11)
+                .foregroundColor(.grayA4ACAD())
+            VStack(alignment: .leading, spacing: 0) {
+                Text(LocalizedStringKey.clickToCall)
+                Text("+\(phoneNumber)")
+            }
+            .customFont(weight: .book, size: 14)
+            .foregroundColor(.black141F1F())
+        }
+        .callInfoStyle()
+        .onTapGesture {
+            makeCall(phoneNumber: phoneNumber)
+        }
+    }
+    
+    func makeCall(phoneNumber: String) {
+        // Add "+" to the phone number
+        let phoneNumberWithPlus = "+\(phoneNumber)"
+
+        if let phoneURL = URL(string: "tel://\(phoneNumberWithPlus)"),
+           UIApplication.shared.canOpenURL(phoneURL) {
+            UIApplication.shared.open(phoneURL, options: [:], completionHandler: nil)
+        } else {
+            print("Error: Unable to initiate the phone call.")
         }
     }
 }

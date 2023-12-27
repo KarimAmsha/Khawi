@@ -118,14 +118,35 @@ extension SMSVerificationView {
             "by": lastPathComponent
         ] as [String : Any]
 
-        viewModel.verify(params: params) { profileCompleted in
+        viewModel.verify(params: params) { profileCompleted, isApprove in
             if profileCompleted {
-                router.replaceNavigationStack(path: [])
-                settings.loggedIn = true
+                if isApprove {
+                    router.replaceNavigationStack(path: [])
+                    settings.loggedIn = true
+                } else {
+                    showMessage()
+                }
                 return
             }
             router.presentViewSpec(viewSpec: .personalInfo)
         }
+    }
+    
+    private func showMessage() {
+        let alertModel = AlertModel(
+            title: LocalizedStringKey.message,
+            message: LocalizedStringKey.approvedSoon,
+            hideCancelButton: true,
+            onOKAction: {
+                router.replaceNavigationStack(path: [])
+                router.dismiss()
+            },
+            onCancelAction: {
+                router.dismiss()
+            }
+        )
+        
+        router.presentToastPopup(view: .alert(alertModel))
     }
     
     private func resendCode() {

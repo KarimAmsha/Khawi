@@ -17,16 +17,16 @@ struct PlusMenu: View {
 
     var body: some View {
         HStack(spacing: 50) {
-            VStack(spacing: 8) {
-                ZStack {
-                    Circle()
-                        .foregroundColor(.white)
-                        .frame(width: widthAndHeight, height: widthAndHeight)
-                    Image("ic_join")
+            VStack(spacing: 0) {
+//                ZStack {
+//                    Circle()
+//                        .foregroundColor(.clear)
+//                        .frame(width: widthAndHeight, height: widthAndHeight)
+                    Image("ic_car_pin")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 24, height: 24)
-                }
+                        .frame(width: 45, height: 45)
+//                }
                 Text(LocalizedStringKey.joiningRequest)
                     .customFont(weight: .book, size: 12)
                     .multilineTextAlignment(.center)
@@ -40,16 +40,16 @@ struct PlusMenu: View {
                 }
             }
             
-            VStack(spacing: 8) {
-                ZStack {
-                    Circle()
-                        .foregroundColor(.white)
-                        .frame(width: widthAndHeight, height: widthAndHeight)
-                    Image("ic_delivery")
+            VStack(spacing: 0) {
+//                ZStack {
+//                    Circle()
+//                        .foregroundColor(.clear)
+//                        .frame(width: widthAndHeight, height: widthAndHeight)
+                    Image("ic_person_pin")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 24, height: 24)
-                }
+                        .frame(width: 45, height: 45)
+//                }
                 Text(LocalizedStringKey.deliveryRequest)
                     .customFont(weight: .book, size: 12)
                     .multilineTextAlignment(.center)

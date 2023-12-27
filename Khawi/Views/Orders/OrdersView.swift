@@ -61,8 +61,10 @@ struct OrdersView: View {
                             print("item.type \(item.orderType)")
                             print("item.type \(item.type)")
                             if item.type == .joining {
+                                print("111")
                                 router.presentViewSpec(viewSpec: .joiningRequestOrderDetailsView(item._id ?? ""))
                             } else {
+                                print("222")
                                 router.presentViewSpec(viewSpec: .deliveryRequestOrderDetailsView(item._id ?? ""))
                             }
                         }

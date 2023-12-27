@@ -15,7 +15,6 @@
 		1E2EAD322AE9A74B00E94804 /* NotificationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2EAD312AE9A74B00E94804 /* NotificationsViewModel.swift */; };
 		1E2EAD362AE9A80000E94804 /* NotificationRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2EAD352AE9A80000E94804 /* NotificationRowView.swift */; };
 		1E2EAD382AE9AACB00E94804 /* NotificationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2EAD372AE9AACB00E94804 /* NotificationItem.swift */; };
-		1E45E4CE2B042A9F000714C7 /* PaymentType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E45E4CD2B042A9F000714C7 /* PaymentType.swift */; };
 		1E4659C82AFBE5C200E1E467 /* ConstantViewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4659C72AFBE5C200E1E467 /* ConstantViewView.swift */; };
 		1E4659CA2AFBE70300E1E467 /* HTMLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4659C92AFBE70300E1E467 /* HTMLView.swift */; };
 		1E4659CC2AFC152A00E1E467 /* Double+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4659CB2AFC152A00E1E467 /* Double+Extensions.swift */; };
@@ -24,6 +23,7 @@
 		1E4B60182B03A97600FDFD4A /* PaymentResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4B60172B03A97600FDFD4A /* PaymentResponse.swift */; };
 		1E4B601A2B03B30F00FDFD4A /* PaymentViewControllerRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4B60192B03B30F00FDFD4A /* PaymentViewControllerRepresentable.swift */; };
 		1E4B601C2B03B32F00FDFD4A /* PaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4B601B2B03B32F00FDFD4A /* PaymentViewController.swift */; };
+		1E4E9B192B383540006D0DD0 /* MapSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4E9B182B383540006D0DD0 /* MapSearch.swift */; };
 		1E53A9F52B05209100C9DF2D /* Mark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E53A9F42B05209100C9DF2D /* Mark.swift */; };
 		1E5745D52AFEF202002E6273 /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5745D42AFEF202002E6273 /* Int+Extensions.swift */; };
 		1E5A63DC2B053A8500237B7B /* NotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5A63DB2B053A8500237B7B /* NotificationHandler.swift */; };
@@ -226,7 +226,6 @@
 		1E2EAD312AE9A74B00E94804 /* NotificationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewModel.swift; sourceTree = "<group>"; };
 		1E2EAD352AE9A80000E94804 /* NotificationRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRowView.swift; sourceTree = "<group>"; };
 		1E2EAD372AE9AACB00E94804 /* NotificationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationItem.swift; sourceTree = "<group>"; };
-		1E45E4CD2B042A9F000714C7 /* PaymentType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentType.swift; sourceTree = "<group>"; };
 		1E4659C72AFBE5C200E1E467 /* ConstantViewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantViewView.swift; sourceTree = "<group>"; };
 		1E4659C92AFBE70300E1E467 /* HTMLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLView.swift; sourceTree = "<group>"; };
 		1E4659CB2AFC152A00E1E467 /* Double+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Extensions.swift"; sourceTree = "<group>"; };
@@ -234,6 +233,7 @@
 		1E4B60172B03A97600FDFD4A /* PaymentResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentResponse.swift; sourceTree = "<group>"; };
 		1E4B60192B03B30F00FDFD4A /* PaymentViewControllerRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentViewControllerRepresentable.swift; sourceTree = "<group>"; };
 		1E4B601B2B03B32F00FDFD4A /* PaymentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentViewController.swift; sourceTree = "<group>"; };
+		1E4E9B182B383540006D0DD0 /* MapSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSearch.swift; sourceTree = "<group>"; };
 		1E53A9F42B05209100C9DF2D /* Mark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mark.swift; sourceTree = "<group>"; };
 		1E5745D42AFEF202002E6273 /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		1E5A63DB2B053A8500237B7B /* NotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationHandler.swift; sourceTree = "<group>"; };
@@ -458,7 +458,6 @@
 				1E1B343B2B0392A200032A09 /* AddBalanceView.swift */,
 				1E4B60192B03B30F00FDFD4A /* PaymentViewControllerRepresentable.swift */,
 				1E4B601B2B03B32F00FDFD4A /* PaymentViewController.swift */,
-				1E45E4CD2B042A9F000714C7 /* PaymentType.swift */,
 				1EE88BBD2B045567009427BC /* PaymentDelegate.swift */,
 			);
 			path = Payment;
@@ -674,6 +673,7 @@
 				1E9CBBEC2AFAD3A000A4B1EE /* OrdersViewModel.swift */,
 				1EE9E7E52AFFF42300187310 /* MapViewModel.swift */,
 				1E5A63DB2B053A8500237B7B /* NotificationHandler.swift */,
+				1E4E9B182B383540006D0DD0 /* MapSearch.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -1103,6 +1103,7 @@
 				1EF6ADDC2AE707EF00E4427E /* MainView.swift in Sources */,
 				1E922A772AE46C2D002BE670 /* LanguageManager.swift in Sources */,
 				1EECE3A92B07CE57001898AB /* CPData.swift in Sources */,
+				1E4E9B192B383540006D0DD0 /* MapSearch.swift in Sources */,
 				1EC966E42AE1DDE6004AC852 /* WelcomeSlideView.swift in Sources */,
 				1EB375F32B0A19C50043F182 /* Tracking.swift in Sources */,
 				1EEA1C8B2AE587850026F092 /* GrowingArcIndicatorView.swift in Sources */,
@@ -1137,7 +1138,6 @@
 				1EC966912AE1556A004AC852 /* KhawiApp.swift in Sources */,
 				1EBD36EE2AF9104800AE1915 /* ConstantItem.swift in Sources */,
 				1EB9B6BF2AEBEDF80032DC99 /* SuccessDeliveryOfferRequestView.swift in Sources */,
-				1E45E4CE2B042A9F000714C7 /* PaymentType.swift in Sources */,
 				1EFA50DC2AFABBE30034858A /* AlertModel.swift in Sources */,
 				1EDFB33D2B0285A600CD1163 /* WalletData.swift in Sources */,
 				1EBD36F02AF9112400AE1915 /* APIResponse.swift in Sources */,
@@ -1381,7 +1381,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"Khawi/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
@@ -1425,7 +1425,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"Khawi/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;

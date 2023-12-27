@@ -73,3 +73,17 @@ extension View {
             }
         }
 }
+
+extension View {
+    func callInfoStyle() -> some View {
+        self
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(Color.grayF9FAFA())
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.grayE6E9EA(), lineWidth: 1)
+            )
+    }
+}

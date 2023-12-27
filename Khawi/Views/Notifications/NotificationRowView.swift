@@ -34,7 +34,7 @@ struct NotificationRowView: View {
                 }
             } else {
                 HStack(spacing: 15) {
-                    Image(notification.notificationType == .join ? "ic_new_notification" : "ic_agree_notification")
+                    Image(notification.notificationType == .orders ? "ic_new_notification" : "ic_agree_notification")
                         .resizable()
                         .frame(width: 94, height: 92)
                     

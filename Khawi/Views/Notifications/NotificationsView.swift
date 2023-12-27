@@ -6,14 +6,16 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct NotificationsView: View {
-        
+    @EnvironmentObject var appState: AppState
     @State private var selectedTab: OrderStatus = .new
     @StateObject private var router: MainRouter
     @StateObject private var viewModel = NotificationsViewModel(errorHandling: ErrorHandling())
     private let errorHandling = ErrorHandling()
     let tabs = [OrderStatus.new, OrderStatus.finished, OrderStatus.canceled]
+    @StateObject private var orderViewModel = OrdersViewModel(initialRegion: MKCoordinateRegion(), errorHandling: ErrorHandling())
 
     init(router: MainRouter) {
         _router = StateObject(wrappedValue: router)
@@ -25,20 +27,16 @@ struct NotificationsView: View {
                 ForEach(viewModel.notificationsItems, id: \.self) { item in
                     NotificationRowView(notification: item)
                         .onTapGesture {
-                            if item.notificationType == .join {
-                                router.presentViewSpec(viewSpec: .joiningRequestOrderDetailsView(item.bodyParams ?? ""))
-                            } else if item.notificationType == .deliver {
-                                router.presentViewSpec(viewSpec: .deliveryRequestOrderDetailsView(item.bodyParams ?? ""))
-                            }
-                        }
-                        .contextMenu {
-                            Button(action: {
-                                // Handle deletion here
-                                deleteNotification(item)
-                            }) {
-                                Text(LocalizedStringKey.delete)
-                                    .font(.system(size: 14, weight: .regular, design: .default)) // Adjust the size and weight as needed
-                                Image(systemName: "trash")
+                            if item.notificationType == .orders {
+                                orderViewModel.getOrderDetails(orderId: item.bodyParams ?? "") {
+                                    if orderViewModel.order?.type == .joining {
+                                        print("111")
+                                        router.presentViewSpec(viewSpec: .joiningRequestOrderDetailsView(orderViewModel.order?._id ?? ""))
+                                    } else {
+                                        print("222")
+                                        router.presentViewSpec(viewSpec: .deliveryRequestOrderDetailsView(orderViewModel.order?._id ?? ""))
+                                    }
+                                }
                             }
                         }
                 }
@@ -67,6 +65,7 @@ struct NotificationsView: View {
         }
         .onAppear {
             loadData()
+            readNotification()
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
@@ -78,6 +77,7 @@ struct NotificationsView: View {
 
 #Preview {
     NotificationsView(router: MainRouter(isPresented: .constant(nil)))
+        .environmentObject(AppState())
 }
 
 extension NotificationsView {
@@ -90,24 +90,9 @@ extension NotificationsView {
         viewModel.loadMoreNotifications(limit: 10)
     }
     
-    func deleteNotification(_ notification: NotificationItem) {
-        // Implement your deletion logic here
-        // You may want to show a confirmation alert before deleting
-        let alertModel = AlertModel(
-            title: LocalizedStringKey.delete,
-            message: LocalizedStringKey.deleteMessage,
-            hideCancelButton: false,
-            onOKAction: {
-                router.dismiss()
-                viewModel.deleteNotifications(id: notification.id ?? "") { message in
-                    loadData()
-                }
-            },
-            onCancelAction: {
-                router.dismiss()
-            }
-        )
-        
-        router.presentToastPopup(view: .alert(alertModel))
+    func readNotification() {
+        viewModel.readNotifications() { message in
+            appState.notificationCountString = nil
+        }
     }
 }

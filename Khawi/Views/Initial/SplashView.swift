@@ -27,6 +27,7 @@ struct SplashView: View {
                         .frame(width: 105, height: 197)
                 )
                 .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 3)
+                .opacity(!isSplash1Visible ? 1 : 0) 
 
             Image(isSplash1Visible ? "splash_map1" : "splash_map2")
                 .resizable()

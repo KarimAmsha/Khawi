@@ -33,30 +33,3 @@ class PaymentViewController: UIViewController {
     }
 }
 
-//extension PaymentViewController: PaymentManagerDelegate {
-//    func paymentManager(didFinishTransaction transactionDetails: PaymentSDKTransactionDetails?, error: Error?) {
-//        if let transactionDetails = transactionDetails, transactionDetails.isSuccess() {
-//            handlePaymentSuccess(transactionDetails: transactionDetails)
-//        } else if let error = error {
-//            handlePaymentError(error: error)
-//        }
-//    }
-//
-//    func handlePaymentSuccess(transactionDetails: PaymentSDKTransactionDetails) {
-//        // Print the response details
-//        print("Transaction Reference22222: \(transactionDetails.transactionReference ?? "")")
-//        print("Transaction Type: \(transactionDetails.transactionType ?? "")")
-//        print("Cart ID: \(transactionDetails.cartID ?? "")")
-//
-//        // Dismiss the current payment view
-//        dismiss(animated: true)
-//    }
-//
-//    func handlePaymentError(error: Error) {
-//        // Handle the payment error here
-//        print("Payment Error: \(error.localizedDescription)")
-//
-//        // Dismiss the current payment view on error
-//        dismiss(animated: true)
-//    }
-//}

@@ -88,41 +88,41 @@ struct DeliveryPopupView: View {
                     }
                     .customFont(weight: .book, size: 12)
                     
-                    HStack(spacing: 16) {
-                        VStack(alignment: .leading) {
-                            Text(LocalizedStringKey.tripDate)
-                                .customFont(weight: .book, size: 11)
-                                .foregroundColor(.grayA4ACAD())
-                            Text(item.dt_time ?? "")
-                                .customFont(weight: .book, size: 14)
-                                .foregroundColor(.black141F1F())
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                        .background(Color.grayF9FAFA())
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
-                        )
-
-                        VStack(alignment: .leading) {
-                            Text(LocalizedStringKey.dateOfTheFirstTrip)
-                                .customFont(weight: .book, size: 11)
-                                .foregroundColor(.grayA4ACAD())
-                            Text(item.formattedDate ?? "")
-                                .customFont(weight: .book, size: 14)
-                                .foregroundColor(.black141F1F())
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                        .background(Color.grayF9FAFA())
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
-                        )
-                    }
+//                    HStack(spacing: 16) {
+//                        VStack(alignment: .leading) {
+//                            Text(LocalizedStringKey.tripDate)
+//                                .customFont(weight: .book, size: 11)
+//                                .foregroundColor(.grayA4ACAD())
+//                            Text(item.dt_time ?? "")
+//                                .customFont(weight: .book, size: 14)
+//                                .foregroundColor(.black141F1F())
+//                        }
+//                        .frame(maxWidth: .infinity, alignment: .leading)
+//                        .padding(12)
+//                        .background(Color.grayF9FAFA())
+//                        .cornerRadius(12)
+//                        .overlay(
+//                            RoundedRectangle(cornerRadius: 12)
+//                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
+//                        )
+//
+//                        VStack(alignment: .leading) {
+//                            Text(LocalizedStringKey.dateOfTheFirstTrip)
+//                                .customFont(weight: .book, size: 11)
+//                                .foregroundColor(.grayA4ACAD())
+//                            Text(item.formattedDate ?? "")
+//                                .customFont(weight: .book, size: 14)
+//                                .foregroundColor(.black141F1F())
+//                        }
+//                        .frame(maxWidth: .infinity, alignment: .leading)
+//                        .padding(12)
+//                        .background(Color.grayF9FAFA())
+//                        .cornerRadius(12)
+//                        .overlay(
+//                            RoundedRectangle(cornerRadius: 12)
+//                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
+//                        )
+//                    }
                 }
             }
             .padding(.horizontal, 24)

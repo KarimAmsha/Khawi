@@ -291,7 +291,6 @@ class OrdersViewModel: ObservableObject {
                     self.handleAPIError(error)
                 }
             }, receiveValue: { [weak self] (response: SingleAPIResponse<Order>) in
-                print("ssss \(response)")
                 if response.status {
                     self?.order = response.items
                     self?.errorMessage = nil

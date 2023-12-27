@@ -21,7 +21,7 @@ class DataProvider {
         case register(params: [String: Any])
         case verify(params: [String: Any])
         case resend(params: [String: Any])
-        case updateUserDataWithImage(params: [String: Any], imageData: Data?, token: String)
+        case updateUserDataWithImage(params: [String: Any], imageData: Data?, carFrontImageData: Data?, carBackImageData: Data?, carRightImageData: Data?, carLeftImageData: Data?, carIDImageData: Data?, carLicanseImageData: Data?, token: String)
         case getUserProfile(token: String)
         case logout(userID: String, token: String)
         case addOrder(params: [String: Any], token: String)
@@ -33,12 +33,13 @@ class DataProvider {
         case getOrderDetails(orderId: String, token: String)
         case addReview(orderID: String, params: [String: Any], token: String)
         case getNotifications(page: Int?, limit: Int?, token: String)
-        case deleteNotification(id: String, token: String)
+        case readNotification(token: String)
         case getWallet(page: Int?, limit: Int?, token: String)
         case addBalanceToWallet(params: [String: Any], token: String)
         case addComplain(params: [String: Any], token: String)
         case createReferal(token : String)
         case checkCoupon(params: [String: Any], token: String)
+        case notificationCount(token: String)
 
         // Map your custom Endpoint to APIEndpoint
         func toAPIEndpoint() -> APIEndpoint {
@@ -55,8 +56,8 @@ class DataProvider {
                 return .verify(params: params)
             case .resend(let params):
                 return .resend(params: params)
-            case .updateUserDataWithImage(let params, let imageData, let token):
-                return .updateUserDataWithImage(params: params, imageData: imageData, token: token)
+            case .updateUserDataWithImage(let params, let imageData, let carFrontImageData, let carBackImageData, let carRightImageData, let carLeftImageData, let carIDImageData, let carLicanseImageData, let token):
+                return .updateUserDataWithImage(params: params, imageData: imageData, carFrontImageData: carFrontImageData, carBackImageData: carBackImageData, carRightImageData: carRightImageData, carLeftImageData: carLeftImageData, carIDImageData: carIDImageData, carLicanseImageData: carLicanseImageData, token: token)
             case .getUserProfile(let token):
                 return .getUserProfile(token: token)
             case .logout(let userID, let token):
@@ -79,8 +80,8 @@ class DataProvider {
                 return .addReview(orderID: orderID, params: params, token: token)
             case .getNotifications(let page, let limit, let token):
                 return .getNotifications(page: page, limit: limit, token: token)
-            case .deleteNotification(let id, let token):
-                return .deleteNotification(id: id, token: token)
+            case .readNotification(let token):
+                return .readNotification(token: token)
             case .getWallet(let page, let limit, let token):
                 return .getWallet(page: page, limit: limit, token: token)
             case .addBalanceToWallet(let params, let token):
@@ -91,6 +92,8 @@ class DataProvider {
                 return .createReferal(token: token)
             case .checkCoupon(let params, let token):
                 return .checkCoupon(params: params, token: token)
+            case .notificationCount(token: let token):
+                return .notificationCount(token: token)
             }
         }
     }

@@ -43,6 +43,11 @@ class UserSettings: ObservableObject {
         }
     }
     
+    func registerToken(token: String) {
+        self.token = token
+        UserDefaults.standard.set(token, forKey:  Keys.token)
+    }
+
     func login(user: User, id: String, token: String) {
         self.user = user
         self.id = id

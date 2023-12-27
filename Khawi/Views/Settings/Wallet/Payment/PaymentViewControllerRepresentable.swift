@@ -50,20 +50,3 @@ struct PaymentViewControllerRepresentable: UIViewControllerRepresentable {
         // Update the view controller if needed
     }
 }
-
-
-//import PaymentSDK
-//
-//class PaymentDelegate: PaymentManagerDelegate {
-//    func paymentManager(didFinishTransaction transactionDetails: PaymentSDKTransactionDetails?, error: Error?) {
-//        if let transactionDetails = transactionDetails, transactionDetails.isSuccess() {
-//            // Handle payment success
-//            print("Payment successful bbbbb!")
-//        } else if let error = error {
-//            // Handle payment error
-//            print("Payment error: \(error.localizedDescription)")
-//            // handlePaymentError(error: error)
-//        }
-//    }
-//}
-//

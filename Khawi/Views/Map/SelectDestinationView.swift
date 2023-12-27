@@ -27,6 +27,7 @@ struct SelectDestinationView: View {
     @State private var isSpecifyStartPoint = false
     @State private var isSpecifyEndPoint = false
     @EnvironmentObject var appState: AppState
+    @State private var userLocation: CLLocationCoordinate2D? = nil
 
     init(router: MainRouter) {
         _router = StateObject(wrappedValue: router)
@@ -46,6 +47,7 @@ struct SelectDestinationView: View {
                             Image("ic_start_point")
                                 .resizable()
                                 .frame(width: 20, height: 20)
+                                .foregroundColor(.blue006E85())
                             if isSpecifyStartPoint {
                                 Image("ic_v_line")
                                 Image("ic_end_point")
@@ -65,6 +67,12 @@ struct SelectDestinationView: View {
                                     Image("ic_edit")
                                         .resizable()
                                         .frame(width: 20, height: 20)
+                                        .onTapGesture {
+                                            isSpecifyStartPoint = false
+                                            startPointAddress = ""
+                                            appState.startPoint = nil
+                                            locations.removeAll()
+                                        }
                                 }
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -83,10 +91,16 @@ struct SelectDestinationView: View {
                                         .foregroundColor(isSpecifyEndPoint ? .black666666() : .grayA4ACAD())
                                         .lineLimit(1)
                                     Spacer()
-                                    if isSpecifyStartPoint {
+                                    if isSpecifyEndPoint {
                                         Image("ic_edit")
                                             .resizable()
                                             .frame(width: 20, height: 20)
+                                            .onTapGesture {
+                                                isSpecifyEndPoint = false
+                                                endPointAddress = ""
+                                                appState.endPoint = nil
+                                                locations.remove(at: 1)
+                                            }
                                     }
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -119,7 +133,7 @@ struct SelectDestinationView: View {
                             }
                             Image(location.imageName)
                                 .font(.title)
-                                .foregroundColor(.red)
+                                .foregroundColor(.blue006E85())
                                 .onTapGesture {
                                     let index: Int = locations.firstIndex(where: {$0.id == location.id})!
                                     locations[index].show.toggle()
@@ -183,7 +197,7 @@ struct SelectDestinationView: View {
                                         locations.removeAll()
                                     }
                                     // Append new location
-                                    let newLocation = Mark(title: locations.isEmpty ? "Start" : "End", coordinate: region.center, show: true, imageName: locations.isEmpty ? "ic_start_point" : "ic_end_point")
+                                    let newLocation = Mark(title: locations.isEmpty ? LocalizedStringKey.startPoint : LocalizedStringKey.endPoint, coordinate: region.center, show: true, imageName: locations.isEmpty ? "ic_start_point" : "ic_end_point")
                                     locations.append(newLocation)
 
                                     // Determine the button label and handle based on the locations count
@@ -203,7 +217,7 @@ struct SelectDestinationView: View {
                             } label: {
                                 Text(!isSpecifyStartPoint ? LocalizedStringKey.specifyStartPoint : (isSpecifyStartPoint && !isSpecifyEndPoint) ? LocalizedStringKey.specifyEndPoint : LocalizedStringKey.joinToTrip)
                             }
-                            .buttonStyle(PrimaryButton(fontSize: 18, fontWeight: .book, background: .primary(), foreground: .white, height: 48, radius: 12))
+                            .buttonStyle(PrimaryButton(fontSize: 18, fontWeight: .book, background: !isSpecifyStartPoint ? .blue006E85() : .primary(), foreground: .white, height: 48, radius: 12))
                             .padding(.horizontal, 24)
                             .padding(.vertical, 19)
                         }
@@ -213,6 +227,31 @@ struct SelectDestinationView: View {
             }
         }
         .navigationTitle(LocalizedStringKey.specifyDestination)
+        .onAppear {
+            // Use the user's current location if available
+            if let userLocation = LocationManager.shared.userLocation {
+                self.userLocation = userLocation
+
+                // Append new location
+                let newLocation = Mark(title: locations.isEmpty ? "Start" : "End", coordinate: region.center, show: true, imageName: locations.isEmpty ? "ic_start_point" : "ic_end_point")
+                locations.append(newLocation)
+
+                // Determine the button label and handle based on the locations count
+                if locations.count == 1 {
+                    isSpecifyStartPoint = true
+                    isSpecifyEndPoint = false
+                } else if locations.count == 2 {
+                    isSpecifyStartPoint = true
+                    isSpecifyEndPoint = true
+                    
+                    appState.startPoint = locations.first
+                    appState.endPoint = locations.last
+                }
+            
+                handleAddressString()
+
+            }
+        }
     }
     
     private func calculateRouteDirections() {

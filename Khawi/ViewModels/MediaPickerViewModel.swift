@@ -14,9 +14,21 @@ class MediaPickerViewModel: ObservableObject {
     @Published var selectedIDImageLastPath: String?
     @Published var selectedLicanseImage: UIImage?
     @Published var selectedLicanseImageLastPath: String?
+    @Published var selectedCarFrontImage: UIImage?
+    @Published var selectedCarFrontImageLastPath: String?
+    @Published var selectedCarBackImage: UIImage?
+    @Published var selectedCarBackImageLastPath: String?
+    @Published var selectedCarRightImage: UIImage?
+    @Published var selectedCarRightImageLastPath: String?
+    @Published var selectedCarLeftImage: UIImage?
+    @Published var selectedCarLeftImageLastPath: String?
     @Published var isPresentingImagePicker = false
     @Published var isPresentingIDImagePicker = false
     @Published var isPresentingLicanseImagePicker = false
+    @Published var isPresentingCarFrontImagePicker = false
+    @Published var isPresentingCarBackImagePicker = false
+    @Published var isPresentingCarRightImagePicker = false
+    @Published var isPresentingCarLeftImagePicker = false
     private(set) var sourceType: ImagePicker.SourceType = .camera
 
     func choosePhoto() {
@@ -26,6 +38,11 @@ class MediaPickerViewModel: ObservableObject {
     
     func takePhoto() {
         sourceType = .camera
+        isPresentingImagePicker = true
+    }
+    
+    func chooseVideo() {
+        sourceType = .photoLibrary
         isPresentingImagePicker = true
     }
     
@@ -48,12 +65,47 @@ class MediaPickerViewModel: ObservableObject {
         sourceType = .camera
         isPresentingLicanseImagePicker = true
     }
-
-    func chooseVideo() {
+    
+    func chooseCarFrontPhoto() {
         sourceType = .photoLibrary
-        isPresentingImagePicker = true
+        isPresentingCarFrontImagePicker = true
     }
     
+    func takeCarFrontPhoto() {
+        sourceType = .camera
+        isPresentingCarFrontImagePicker = true
+    }
+
+    func chooseCarBackPhoto() {
+        sourceType = .photoLibrary
+        isPresentingCarBackImagePicker = true
+    }
+    
+    func takeCarBackPhoto() {
+        sourceType = .camera
+        isPresentingCarBackImagePicker = true
+    }
+
+    func chooseCarRightPhoto() {
+        sourceType = .photoLibrary
+        isPresentingCarRightImagePicker = true
+    }
+    
+    func takeCarRightPhoto() {
+        sourceType = .camera
+        isPresentingCarRightImagePicker = true
+    }
+
+    func chooseCarLeftPhoto() {
+        sourceType = .photoLibrary
+        isPresentingCarLeftImagePicker = true
+    }
+    
+    func takeCarLeftPhoto() {
+        sourceType = .camera
+        isPresentingCarLeftImagePicker = true
+    }
+
     func didSelectImage(_ image: UIImage?, _ lastPath: String?) {
         selectedImage = image
         selectedImageLastPath = lastPath
@@ -71,6 +123,30 @@ class MediaPickerViewModel: ObservableObject {
         selectedLicanseImage = image
         selectedLicanseImageLastPath = lastPath
         isPresentingLicanseImagePicker = false
+    }
+    
+    func didSelectCarFrontImage(_ image: UIImage?, _ lastPath: String?) {
+        selectedCarFrontImage = image
+        selectedCarFrontImageLastPath = lastPath
+        isPresentingCarFrontImagePicker = false
+    }
+
+    func didSelectCarBackImage(_ image: UIImage?, _ lastPath: String?) {
+        selectedCarBackImage = image
+        selectedCarBackImageLastPath = lastPath
+        isPresentingCarBackImagePicker = false
+    }
+
+    func didSelectCarRightImage(_ image: UIImage?, _ lastPath: String?) {
+        selectedCarRightImage = image
+        selectedCarRightImageLastPath = lastPath
+        isPresentingCarRightImagePicker = false
+    }
+
+    func didSelectCarLeftImage(_ image: UIImage?, _ lastPath: String?) {
+        selectedCarLeftImage = image
+        selectedCarLeftImageLastPath = lastPath
+        isPresentingCarLeftImagePicker = false
     }
 }
 

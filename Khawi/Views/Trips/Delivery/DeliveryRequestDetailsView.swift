@@ -95,14 +95,14 @@ struct DeliveryRequestDetailsView: View {
                                     // Show accepted offers
                                     ScrollView(showsIndicators: false) {
                                         ForEach(acceptedOffers, id: \.self) { item in
-                                            RequestsRowView(item: item, type: .delivery, settings: settings, onSelectDetails: {
-                                                if let order = viewModel.order {
-                                                    router.presentViewSpec(viewSpec: .showOfferDetails(order, item))
+                                            RequestsRowView(item: item, type: .delivery, settings: settings, onSelectAccept: {
+                                                withAnimation {
+                                                    updateOfferStatus(offer: item, status: .acceptOffer)
                                                 }
-                                            }, onSelectAttend: {
-                                                updateOfferStatus(offer: item, status: .attend)
-                                            }, onSelectNotAttend: {
-                                                updateOfferStatus(offer: item, status: .notAttend)
+                                            }, onSelectReject: {
+                                                withAnimation {
+                                                    updateOfferStatus(offer: item, status: .rejectOffer)
+                                                }
                                             })
                                         }
                                     }
@@ -119,14 +119,10 @@ struct DeliveryRequestDetailsView: View {
                                     
                                     ScrollView(showsIndicators: false) {
                                         ForEach(otherOffers, id: \.self) { item in
-                                            RequestsRowView(item: item, type: .delivery, settings: settings, onSelectDetails: {
-                                                if let order = viewModel.order {
-                                                    router.presentViewSpec(viewSpec: .showOfferDetails(order, item))
-                                                }
-                                            }, onSelectAttend: {
-                                                updateOfferStatus(offer: item, status: .attend)
-                                            }, onSelectNotAttend: {
-                                                updateOfferStatus(offer: item, status: .notAttend)
+                                            RequestsRowView(item: item, type: .delivery, settings: settings, onSelectAccept: {
+                                                updateOfferStatus(offer: item, status: .acceptOffer)
+                                            }, onSelectReject: {
+                                                updateOfferStatus(offer: item, status: .rejectOffer)
                                             })
                                         }
                                     }
@@ -134,41 +130,41 @@ struct DeliveryRequestDetailsView: View {
                             }
                     }
                                         
-                    HStack(spacing: 16) {
-                        VStack(alignment: .leading) {
-                            Text(LocalizedStringKey.tripDate)
-                                .customFont(weight: .book, size: 11)
-                                .foregroundColor(.grayA4ACAD())
-                            Text(viewModel.order?.dt_time ?? "")
-                                .customFont(weight: .book, size: 14)
-                                .foregroundColor(.black141F1F())
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                        .background(Color.grayF9FAFA())
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
-                        )
-
-                        VStack(alignment: .leading) {
-                            Text(LocalizedStringKey.dateOfTheFirstTrip)
-                                .customFont(weight: .book, size: 11)
-                                .foregroundColor(.grayA4ACAD())
-                            Text(viewModel.order?.formattedDate ?? "")
-                                .customFont(weight: .book, size: 14)
-                                .foregroundColor(.black141F1F())
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                        .background(Color.grayF9FAFA())
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
-                        )
-                    }
+//                    HStack(spacing: 16) {
+//                        VStack(alignment: .leading) {
+//                            Text(LocalizedStringKey.tripDate)
+//                                .customFont(weight: .book, size: 11)
+//                                .foregroundColor(.grayA4ACAD())
+//                            Text(viewModel.order?.dt_time ?? "")
+//                                .customFont(weight: .book, size: 14)
+//                                .foregroundColor(.black141F1F())
+//                        }
+//                        .frame(maxWidth: .infinity, alignment: .leading)
+//                        .padding(12)
+//                        .background(Color.grayF9FAFA())
+//                        .cornerRadius(12)
+//                        .overlay(
+//                            RoundedRectangle(cornerRadius: 12)
+//                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
+//                        )
+//
+//                        VStack(alignment: .leading) {
+//                            Text(LocalizedStringKey.dateOfTheFirstTrip)
+//                                .customFont(weight: .book, size: 11)
+//                                .foregroundColor(.grayA4ACAD())
+//                            Text(viewModel.order?.formattedDate ?? "")
+//                                .customFont(weight: .book, size: 14)
+//                                .foregroundColor(.black141F1F())
+//                        }
+//                        .frame(maxWidth: .infinity, alignment: .leading)
+//                        .padding(12)
+//                        .background(Color.grayF9FAFA())
+//                        .cornerRadius(12)
+//                        .overlay(
+//                            RoundedRectangle(cornerRadius: 12)
+//                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
+//                        )
+//                    }
                     
                     VStack(alignment: .leading) {
                         Text(LocalizedStringKey.price)
@@ -244,7 +240,7 @@ struct DeliveryRequestDetailsView: View {
                             .background(Circle().foregroundColor(.white).padding(4).overlay(Circle().stroke(Color.primary(), lineWidth: 2))
                             )
                             
-                            VStack(spacing: 6) {
+                            VStack(alignment: .leading, spacing: 6) {
                                 Text(viewModel.order?.user?.full_name ?? "")
                                     .customFont(weight: .book, size: 16)
                                     .foregroundColor(.black141F1F())
@@ -404,6 +400,10 @@ struct DeliveryRequestDetailsView: View {
                                     }
                                 }
                             }
+                            
+                            if let currentUser = settings.user {
+                                DeliverCallInfoView(acceptedUser: acceptedUser, order: order, currentUser: currentUser)
+                            }
                         }
                     }
  
@@ -466,7 +466,8 @@ struct DeliveryRequestDetailsView: View {
                                 if !userHasOffer {
                                     // Present the "Make Delivery Offer" button
                                     Button {
-                                        router.presentViewSpec(viewSpec: .deliveryOfferView(order))
+                                        makeOffer()
+//                                        router.presentViewSpec(viewSpec: .deliveryOfferView(order))
                                     } label: {
                                         Text(LocalizedStringKey.makeDeliveryOffer)
                                     }
@@ -474,11 +475,22 @@ struct DeliveryRequestDetailsView: View {
                                     .padding(.top, 10)
                                 } else {
                                     if let currentUserOffer = offers.first(where: { $0.user?._id == settings.id && $0.status == "accept_offer" }) {
-                                        if order.orderStatus == .accepted {
+                                        if order.orderStatus == .new {
+                                            Button {
+                                                withAnimation {
+                                                    updateOrderStatus(status: .accepted)
+                                                }
+                                            } label: {
+                                                Text(LocalizedStringKey.accept)
+                                            }
+                                            .buttonStyle(PrimaryButton(fontSize: 18, fontWeight: .book, background: .green0CB057(), foreground: .white, height: 48, radius: 12))
+                                        } else if order.orderStatus == .accepted {
                                             // Handle started status
                                             Button {
-                                                updateOrderStatus(status: .started)
-                                                fetchAndTrackingDriverLocation()
+                                                withAnimation {
+                                                    updateOrderStatus(status: .started)
+                                                    fetchAndTrackingDriverLocation()
+                                                }
                                             } label: {
                                                 Text(LocalizedStringKey.start)
                                             }
@@ -486,8 +498,10 @@ struct DeliveryRequestDetailsView: View {
                                         } else if order.orderStatus == .started {
                                             // Handle finished status
                                             Button {
-                                                updateOrderStatus(status: .finished)
-                                                deleteAndstopUpdateDriverLocation()
+                                                withAnimation {
+                                                    updateOrderStatus(status: .finished)
+                                                    deleteAndstopUpdateDriverLocation()
+                                                }
                                             } label: {
                                                 Text(LocalizedStringKey.finish)
                                             }
@@ -613,6 +627,62 @@ extension DeliveryRequestDetailsView {
             userViewModel.observeDriverLocation(orderID: orderID) { tracking in
                 self.driverLocation = CLLocationCoordinate2D(latitude: tracking.lat, longitude: tracking.lng)
             }
+        }
+    }
+}
+
+extension DeliveryRequestDetailsView {
+    func makeOffer() {
+        guard let order = viewModel.order else {
+            // Handle the case where order is nil
+            return
+        }
+
+        var params: [String: Any] = [:]
+
+        viewModel.addOfferToOrder(orderId: order.id ?? "", params: params) { message in
+            router.replaceNavigationStack(path: [])
+            router.presentToastPopup(view: .joiningSuccess(order.id ?? "", message))
+        }
+    }
+}
+
+struct DeliverCallInfoView: View {
+    let acceptedUser: User
+    let order: Order
+    let currentUser: User
+
+    var phoneNumber: String {
+        acceptedUser._id == currentUser._id ? order.user?.phone_number ?? "" : acceptedUser.phone_number ?? ""
+    }
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(LocalizedStringKey.callInfo)
+                .customFont(weight: .book, size: 11)
+                .foregroundColor(.grayA4ACAD())
+            VStack(alignment: .leading, spacing: 0) {
+                Text(LocalizedStringKey.clickToCall)
+                Text("+\(phoneNumber)")
+            }
+            .customFont(weight: .book, size: 14)
+            .foregroundColor(.black141F1F())
+        }
+        .callInfoStyle()
+        .onTapGesture {
+            makeCall(phoneNumber: phoneNumber)
+        }
+    }
+    
+    func makeCall(phoneNumber: String) {
+        // Add "+" to the phone number
+        let phoneNumberWithPlus = "+\(phoneNumber)"
+
+        if let phoneURL = URL(string: "tel://\(phoneNumberWithPlus)"),
+           UIApplication.shared.canOpenURL(phoneURL) {
+            UIApplication.shared.open(phoneURL, options: [:], completionHandler: nil)
+        } else {
+            print("Error: Unable to initiate the phone call.")
         }
     }
 }

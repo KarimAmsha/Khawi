@@ -39,7 +39,7 @@ struct NewDeliveryRequestView: View {
         GeometryReader { geometry in
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 16) {
-                    CustomTextField(text: $title, placeholder: LocalizedStringKey.tripTitle, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
+                    CustomTextField(text: $title, placeholder: LocalizedStringKey.tripTitleOptional, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
                         .disabled(ordersViewModel.isLoading)
 
                     Button {
@@ -129,118 +129,118 @@ struct NewDeliveryRequestView: View {
                         }
                     }
                     
-                    WithPopover(showPopover: $appState.showingDatePicker, popoverSize: popoverSize) {
-                        Button(action: {
-                            withAnimation {
-                                appState.showingDatePicker.toggle()
-                            }
-                        }) {
-                            HStack {
-                                Text(dateStr.isEmpty ? LocalizedStringKey.tripDate : dateStr)
-                                    .customFont(weight: .book, size: 14)
-                                Spacer()
-                                Spacer()
-                                Image(systemName: "arrow.left")
-                                    .resizable()
-                                    .frame(width: 10, height: 10)
-                            }
-                            .foregroundColor(.black666666())
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                        .background(Color.grayF9FAFA())
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
-                        )
-                        .disabled(ordersViewModel.isLoading)
-                    } popoverContent: {
-                        VStack {
-                            HStack(alignment: .firstTextBaseline, spacing: 0) {
-                                Button(LocalizedStringKey.cancel) {
-                                    withAnimation {
-                                        appState.showingDatePicker.toggle()
-                                    }
-                                }
-                                .buttonStyle(PopOverButtonStyle())
-                                Spacer()
-                                Button(LocalizedStringKey.done) {
-                                    appState.showingDatePicker.toggle()
-                                    dateStr = date.toString(format: "yyyy-MM-dd")
-                                }
-                                .buttonStyle(PopOverButtonStyle())
-                            }
-                            .padding([.leading, .trailing], 20)
-                            
-                            DatePicker(LocalizedStringKey.tripDate, selection: $date,
-                                       in: Date()...,
-                                       displayedComponents: .date)
-                                .labelsHidden()
-                                .datePickerStyle(WheelDatePickerStyle())
-                                .padding(.bottom, -40)
-                                .transition(.opacity)
-                                .onDisappear {
-                                    dateStr = date.toString(format: "yyyy-MM-dd")
-                                }
-                        }
-                    }
+//                    WithPopover(showPopover: $appState.showingDatePicker, popoverSize: popoverSize) {
+//                        Button(action: {
+//                            withAnimation {
+//                                appState.showingDatePicker.toggle()
+//                            }
+//                        }) {
+//                            HStack {
+//                                Text(dateStr.isEmpty ? LocalizedStringKey.tripDate : dateStr)
+//                                    .customFont(weight: .book, size: 14)
+//                                Spacer()
+//                                Spacer()
+//                                Image(systemName: "arrow.left")
+//                                    .resizable()
+//                                    .frame(width: 10, height: 10)
+//                            }
+//                            .foregroundColor(.black666666())
+//                        }
+//                        .frame(maxWidth: .infinity, alignment: .leading)
+//                        .padding(12)
+//                        .background(Color.grayF9FAFA())
+//                        .cornerRadius(12)
+//                        .overlay(
+//                            RoundedRectangle(cornerRadius: 12)
+//                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
+//                        )
+//                        .disabled(ordersViewModel.isLoading)
+//                    } popoverContent: {
+//                        VStack {
+//                            HStack(alignment: .firstTextBaseline, spacing: 0) {
+//                                Button(LocalizedStringKey.cancel) {
+//                                    withAnimation {
+//                                        appState.showingDatePicker.toggle()
+//                                    }
+//                                }
+//                                .buttonStyle(PopOverButtonStyle())
+//                                Spacer()
+//                                Button(LocalizedStringKey.done) {
+//                                    appState.showingDatePicker.toggle()
+//                                    dateStr = date.toString(format: "yyyy-MM-dd")
+//                                }
+//                                .buttonStyle(PopOverButtonStyle())
+//                            }
+//                            .padding([.leading, .trailing], 20)
+//                            
+//                            DatePicker(LocalizedStringKey.tripDate, selection: $date,
+//                                       in: Date()...,
+//                                       displayedComponents: .date)
+//                                .labelsHidden()
+//                                .datePickerStyle(WheelDatePickerStyle())
+//                                .padding(.bottom, -40)
+//                                .transition(.opacity)
+//                                .onDisappear {
+//                                    dateStr = date.toString(format: "yyyy-MM-dd")
+//                                }
+//                        }
+//                    }
                     
-                    WithPopover(showPopover: $appState.showingTimePicker, popoverSize: popoverSize) {
-                        Button(action: {
-                            withAnimation {
-                                appState.showingTimePicker.toggle()
-                            }
-                        }) {
-                            HStack {
-                                Text(timeStr.isEmpty ? LocalizedStringKey.tripTime : timeStr)
-                                    .customFont(weight: .book, size: 14)
-                                Spacer()
-                                Spacer()
-                                Image(systemName: "arrow.left")
-                                    .resizable()
-                                    .frame(width: 10, height: 10)
-                            }
-                            .foregroundColor(.black666666())
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                        .background(Color.grayF9FAFA())
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
-                        )
-                        .disabled(ordersViewModel.isLoading)
-                    } popoverContent: {
-                        VStack {
-                            HStack(alignment: .firstTextBaseline, spacing: 0) {
-                                Button(LocalizedStringKey.cancel) {
-                                    withAnimation {
-                                        appState.showingTimePicker.toggle()
-                                    }
-                                }
-                                .buttonStyle(PopOverButtonStyle())
-                                Spacer()
-                                Button(LocalizedStringKey.done) {
-                                    appState.showingTimePicker.toggle()
-                                    timeStr = time.toString(format: "hh: mm a")
-                                }
-                                .buttonStyle(PopOverButtonStyle())
-                            }
-                            .padding([.leading, .trailing], 20)
-                            
-                            DatePicker(LocalizedStringKey.tripTime, selection: $time,
-                                       displayedComponents: .hourAndMinute)
-                                .labelsHidden()
-                                .datePickerStyle(WheelDatePickerStyle())
-                                .padding(.bottom, -40)
-                                .transition(.opacity)
-                                .onDisappear {
-                                    timeStr = time.toString(format: "hh: mm a")
-                                }
-                        }
-                    }
+//                    WithPopover(showPopover: $appState.showingTimePicker, popoverSize: popoverSize) {
+//                        Button(action: {
+//                            withAnimation {
+//                                appState.showingTimePicker.toggle()
+//                            }
+//                        }) {
+//                            HStack {
+//                                Text(timeStr.isEmpty ? LocalizedStringKey.tripTime : timeStr)
+//                                    .customFont(weight: .book, size: 14)
+//                                Spacer()
+//                                Spacer()
+//                                Image(systemName: "arrow.left")
+//                                    .resizable()
+//                                    .frame(width: 10, height: 10)
+//                            }
+//                            .foregroundColor(.black666666())
+//                        }
+//                        .frame(maxWidth: .infinity, alignment: .leading)
+//                        .padding(12)
+//                        .background(Color.grayF9FAFA())
+//                        .cornerRadius(12)
+//                        .overlay(
+//                            RoundedRectangle(cornerRadius: 12)
+//                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
+//                        )
+//                        .disabled(ordersViewModel.isLoading)
+//                    } popoverContent: {
+//                        VStack {
+//                            HStack(alignment: .firstTextBaseline, spacing: 0) {
+//                                Button(LocalizedStringKey.cancel) {
+//                                    withAnimation {
+//                                        appState.showingTimePicker.toggle()
+//                                    }
+//                                }
+//                                .buttonStyle(PopOverButtonStyle())
+//                                Spacer()
+//                                Button(LocalizedStringKey.done) {
+//                                    appState.showingTimePicker.toggle()
+//                                    timeStr = time.toString(format: "hh: mm a")
+//                                }
+//                                .buttonStyle(PopOverButtonStyle())
+//                            }
+//                            .padding([.leading, .trailing], 20)
+//                            
+//                            DatePicker(LocalizedStringKey.tripTime, selection: $time,
+//                                       displayedComponents: .hourAndMinute)
+//                                .labelsHidden()
+//                                .datePickerStyle(WheelDatePickerStyle())
+//                                .padding(.bottom, -40)
+//                                .transition(.opacity)
+//                                .onDisappear {
+//                                    timeStr = time.toString(format: "hh: mm a")
+//                                }
+//                        }
+//                    }
                     
                     CustomTextField(text: $passengersCount, placeholder: LocalizedStringKey.passengersCount, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
                         .keyboardType(.numberPad)
@@ -324,6 +324,12 @@ struct NewDeliveryRequestView: View {
     }
 
     func destinationSelected() -> Bool {
+        if title.isEmpty, let endPoint = appState.endPoint {
+            Utilities.getShortAddress(for: endPoint.coordinate) { address in
+                title = address
+            }
+        }
+        
         return appState.startPoint != nil && appState.endPoint != nil
     }
 

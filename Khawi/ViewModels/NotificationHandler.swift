@@ -34,7 +34,6 @@ class NotificationHandler: ObservableObject {
     }
 
     func handleRemoteNotification(userInfo: [AnyHashable: Any]) {
-        print("ffff \(userInfo)")
         NotificationCenter.default.post(name: NotificationHandler.orderNotificationUpdateNotification, object: nil)
     }
 

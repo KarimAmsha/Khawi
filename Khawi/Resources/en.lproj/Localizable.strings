@@ -113,6 +113,7 @@
 "Finicial Transactions" = "Finicial Transactions";
 "Add Account" = "Add Account";
 "Trip Title" = "Trip Title";
+"Trip Title Optional" = "Trip Title (Optional)";
 "First Trip Date" = "First Trip Date";
 "Maximum number of passengers per flight" = "Maximum number of passengers per flight";
 "Submit Join Request" = "Submit Join Request";
@@ -169,3 +170,13 @@
 "Your country" = "Your country";
 "Coupon" = "Coupon";
 "Invite Friend" = "Invite Friend";
+"Car Front Image" = "Car Front Image";
+"Car Back Image" = "Car Back Image";
+"Car Right Image" = "Car Right Image";
+"Car Left Image" = "Car Left Image";
+"Identity Image" = "Identity Image";
+"License Image" = "License Image";
+"You don't have a car" = "You don't have a car";
+"Your account will be approved soon" = "Your account will be approved soon";
+"Call Info" = "Call Info";
+"Click to call" = "Click to call Number";

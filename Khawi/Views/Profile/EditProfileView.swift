@@ -19,12 +19,19 @@ struct EditProfileView: View {
     @State private var carModel = ""
     @State private var carColor = ""
     @State private var carNumber = ""
-    @State private var isFloatingPickerPresented = false
     @StateObject var settings: UserSettings
     @StateObject private var router: MainRouter
     private let errorHandling = ErrorHandling()
     @StateObject private var viewModel = UserViewModel(errorHandling: ErrorHandling())
     @State private var userLocation: CLLocationCoordinate2D? = nil
+    @State private var isFloatingPickerPresented = false
+    @State private var isFloatingCarFrontImagePickerPresented = false
+    @State private var isFloatingCarBackImagePickerPresented = false
+    @State private var isFloatingCarRightImagePickerPresented = false
+    @State private var isFloatingCarLeftImagePickerPresented = false
+    @State private var isFloatingIdentityImagePickerPresented = false
+    @State private var isFloatingLicenseImagePickerPresented = false
+    @StateObject private var authViewModel = AuthViewModel(errorHandling: ErrorHandling())
 
     private var isImageSelected: Bool {
         mediaPickerViewModel.selectedImage != nil
@@ -125,6 +132,56 @@ struct EditProfileView: View {
                                     .disabled(viewModel.isLoading)
                                 CustomTextFieldWithTitle(text: $carNumber, placeholder: LocalizedStringKey.carNumber, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
                                     .disabled(viewModel.isLoading)
+                                
+                                VStack(spacing: 16) {
+                                    HStack(spacing: 16) {
+                                        createImageSection(image: mediaPickerViewModel.selectedCarFrontImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingCarFrontImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.carFrontImage,
+                                                           imageURL: viewModel.user?.carFrontImage?.toURL())
+
+                                        Spacer()
+
+                                        createImageSection(image: mediaPickerViewModel.selectedCarBackImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingCarBackImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.carBackImage,
+                                                           imageURL: viewModel.user?.carBackImage?.toURL())
+                                    }
+
+                                    HStack(spacing: 16) {
+                                        createImageSection(image: mediaPickerViewModel.selectedCarRightImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingCarRightImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.carRightImage,
+                                                           imageURL: viewModel.user?.carRightImage?.toURL())
+
+                                        Spacer()
+
+                                        createImageSection(image: mediaPickerViewModel.selectedCarLeftImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingCarLeftImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.carLeftImage,
+                                                           imageURL: viewModel.user?.carLeftImage?.toURL())
+                                    }
+
+                                    HStack(spacing: 16) {
+                                        createImageSection(image: mediaPickerViewModel.selectedIDImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingIdentityImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.identityImage,
+                                                           imageURL: viewModel.user?.identityImage?.toURL())
+
+                                        Spacer()
+
+                                        createImageSection(image: mediaPickerViewModel.selectedLicanseImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingLicenseImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.licenseImage,
+                                                           imageURL: viewModel.user?.licenseImage?.toURL())
+                                    }
+                                }
                             }
                         }
 
@@ -162,6 +219,24 @@ struct EditProfileView: View {
         .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingImagePicker, content: {
             ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectImage)
         })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingCarFrontImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectCarFrontImage)
+        })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingCarBackImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectCarBackImage)
+        })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingCarRightImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectCarRightImage)
+        })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingCarLeftImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectCarLeftImage)
+        })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingIDImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectIDImage)
+        })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingLicanseImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectLicanseImage)
+        })
         .popup(isPresented: $isFloatingPickerPresented) {
             FloatingPickerView(
                 isPresented: $isFloatingPickerPresented,
@@ -172,6 +247,132 @@ struct EditProfileView: View {
                 onTakePhoto: {
                     // Handle taking a photo here
                     mediaPickerViewModel.takePhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingCarFrontImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingCarFrontImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseCarFrontPhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeCarFrontPhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingCarBackImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingCarBackImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseCarBackPhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeCarBackPhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingCarRightImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingCarRightImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseCarRightPhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeCarRightPhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingCarLeftImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingCarLeftImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseCarLeftPhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeCarLeftPhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingIdentityImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingIdentityImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseIDPhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeIDPhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingLicenseImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingLicenseImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseLicensePhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeLicensePhoto()
                 }
             )
         } customize: {
@@ -194,6 +395,77 @@ struct EditProfileView: View {
             if let errorMessage = errorMessage {
                 router.presentToastPopup(view: .error("", errorMessage))
             }
+        }
+    }
+    
+    private func createImageSection(image: UIImage?, placeholder: String, action: @escaping () -> Void, title: String, imageURL: URL?) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(title)
+                .customFont(weight: .book, size: 16)
+                .foregroundColor(.grayA4ACAD())
+            
+            Button(action: action) {
+                if let img = image {
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 120, height: 120)
+                        .background(Color.grayF9FAFA())
+                        .cornerRadius(16)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
+                        )
+                } else {
+                    if let userImageURL = imageURL {
+                        AsyncImage(url: userImageURL) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 120, height: 120)
+                                    .background(Color.grayF9FAFA())
+                                    .cornerRadius(16)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(Color.grayE6E9EA(), lineWidth: 1)
+                                    )
+                            case .failure:
+                                Image(systemName: "photo")
+                                    .resizable()
+                                    .imageScale(.large)
+                                    .foregroundColor(.gray)
+                                    .frame(width: 120, height: 120)
+                                    .background(Color.grayF9FAFA())
+                                    .cornerRadius(16)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(Color.grayE6E9EA(), lineWidth: 1)
+                                    )
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    } else {
+                        // Use a default placeholder for cases where the image URL is not available
+                        Image(systemName: placeholder)
+                            .resizable()
+                            .imageScale(.large)
+                            .foregroundColor(.gray)
+                            .frame(width: 120, height: 120)
+                            .background(Color.grayF9FAFA())
+                            .cornerRadius(16)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(Color.grayE6E9EA(), lineWidth: 1)
+                            )
+                    }
+                }
+            }
+            .disabled(viewModel.isLoading)
         }
     }
 }
@@ -219,6 +491,12 @@ extension EditProfileView {
     
     private func update() {
         var imageData: Data? = nil
+        var imageCarFrontData: Data? = nil
+        var imageCarBackData: Data? = nil
+        var imageCarRightData: Data? = nil
+        var imageCarLeftData: Data? = nil
+        var imageIDData: Data? = nil
+        var imageLicanseData: Data? = nil
         var additionalParams: [String: Any] = [:]
 
         if isImageSelected, let uiImage = mediaPickerViewModel.selectedImage {
@@ -226,6 +504,36 @@ extension EditProfileView {
             imageData = uiImage.jpegData(compressionQuality: 0.6)
         }
         
+        if let uiImage = mediaPickerViewModel.selectedCarFrontImage {
+            // Convert the UIImage to Data, if needed
+            imageCarFrontData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
+        if let uiImage = mediaPickerViewModel.selectedCarBackImage {
+            // Convert the UIImage to Data, if needed
+            imageCarBackData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
+        if let uiImage = mediaPickerViewModel.selectedCarRightImage {
+            // Convert the UIImage to Data, if needed
+            imageCarRightData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
+        if let uiImage = mediaPickerViewModel.selectedCarLeftImage {
+            // Convert the UIImage to Data, if needed
+            imageCarLeftData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
+        if let uiImage = mediaPickerViewModel.selectedIDImage {
+            // Convert the UIImage to Data, if needed
+            imageIDData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
+        if let uiImage = mediaPickerViewModel.selectedLicanseImage {
+            // Convert the UIImage to Data, if needed
+            imageLicanseData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
         additionalParams = [
             "email": email,
             "full_name": name,
@@ -248,20 +556,31 @@ extension EditProfileView {
         }
 
         dispatchGroup.notify(queue: .main) {
-            viewModel.updateUserDataWithImage(imageData: imageData, additionalParams: additionalParams) {
-                showMessage()
+            viewModel.updateUserDataWithImage(imageData: imageData, carFrontImageData: imageCarFrontData, carBackImageData: imageCarBackData, carRightImageData: imageCarRightData, carLeftImageData: imageCarLeftData, carIDImageData: imageIDData, carLicenseImageData: imageLicanseData, additionalParams: additionalParams) { hasCar, message in
+                if !hasCar {
+                    showMessage(message: LocalizedStringKey.successfullyUpdated)
+                } else {
+                    showMessage(message: message)
+                }
+
             }
         }
     }
     
-    private func showMessage() {
+    private func showMessage(message: String) {
         let alertModel = AlertModel(
             title: LocalizedStringKey.message,
-            message: LocalizedStringKey.successfullyUpdated,
+            message: message,
             hideCancelButton: true,
             onOKAction: {
+                if hasCar {
+                    router.navigateBack()
+                    authViewModel.logoutUser {
+                    }
+                } else {
+                    router.navigateBack()
+                }
                 router.dismiss()
-                router.navigateBack()
             },
             onCancelAction: {
                 router.dismiss()

@@ -87,20 +87,6 @@ struct RegisterView: View {
                             }
                     }
                     .environment(\.layoutDirection, .leftToRight)
-                    
-//                    iPhoneNumberField("000000000000", text: $mobile, isEditing: $isEditing)
-//                        .flagHidden(false)
-//                        .flagSelectable(true)
-//                        .defaultRegion(selectedRegion)
-//                        .formatted(true)
-//                        .maximumDigits(12)
-//                        .foregroundColor(.black141F1F())
-//                        .clearButtonMode(.whileEditing)
-//                        .onClear { _ in isEditing.toggle() }
-//                        .customFont(weight: .book, size: 14)
-//                        .accentColor(Color.primary())
-//                        .disabled(viewModel.isLoading)
-//                        .environment(\.layoutDirection, .leftToRight)
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
@@ -233,6 +219,7 @@ extension RegisterView {
             "fcmToken": fcmToken,
             "lat": userLocation?.latitude ?? 0.0,
             "lng": userLocation?.longitude ?? 0.0,
+            "address": "",
         ] as [String : Any]
         
         viewModel.registerUser(params: params, onsuccess: { id in

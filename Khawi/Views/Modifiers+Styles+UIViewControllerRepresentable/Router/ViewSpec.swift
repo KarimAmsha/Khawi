@@ -81,7 +81,6 @@ enum ViewSpec: Equatable, Hashable {
     case showOfferOnMap(Offer)
     case constant(ConstantItem)
     case addBalance
-    case paymentView(PaymentType)
     case addComplain
 }
 

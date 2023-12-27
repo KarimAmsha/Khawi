@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SearchBar: View {
     @Binding var text: String
-    var placeholder: String 
+    var placeholder: String
     
     var body: some View {
         HStack {
@@ -22,6 +22,22 @@ struct SearchBar: View {
                 .customFont(weight: .book, size: 16)
                 .textFieldStyle(PlainTextFieldStyle())
                 .accentColor(.primary())
+            
+            // Clear button (X)
+            if !text.isEmpty {
+                Button(action: {
+                    withAnimation {
+                        text = ""
+                    }
+                }) {
+                    Image(systemName: "multiply.circle.fill")
+                        .resizable()
+                        .frame(width: 16, height: 16)
+                        .foregroundColor(.black141F1F())
+                }
+                .padding(.trailing, 8)
+                .transition(.move(edge: .trailing))
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: 50)
         .padding(.horizontal, 16)
@@ -40,4 +56,3 @@ struct SearchBar: View {
 #Preview {
     SearchBar(text: .constant(""), placeholder: LocalizedStringKey.searchForPlace)
 }
-

@@ -66,23 +66,46 @@ extension APIClient {
         return performRequest(for: endpoint, with: dataRequest)
     }
     
+    // Helper method to create multipart form data
+    private func createMultipartFormData(multipartFormData: MultipartFormData, imageFiles: [(Data, String)]?, parameters: [String: Any]?) {
+        if let imageFiles = imageFiles {
+            for (imageData, fieldName) in imageFiles {
+                multipartFormData.append(imageData, withName: fieldName, fileName: "\(fieldName).jpg", mimeType: "\(fieldName)/jpeg")
+            }
+        }
+
+        if let parameters = parameters {
+            for (key, value) in parameters {
+                if let data = "\(value)".data(using: .utf8) {
+                    multipartFormData.append(data, withName: key)
+                }
+            }
+        }
+    }
+
     func requestMultipartPublisherWithProgress<T: Decodable>(endpoint: APIEndpoint, imageFiles: [(Data, String)]?) -> AnyPublisher<(T, Double), APIError> {
         return Future { promise in
             var request = AF.upload(multipartFormData: { multipartFormData in
-                if let imageFiles = imageFiles {
-                    for (imageData, fieldName) in imageFiles {
-                        multipartFormData.append(imageData, withName: fieldName, fileName: "image.jpg", mimeType: "image/jpeg")
-                    }
-                }
+                self.createMultipartFormData(
+                    multipartFormData: multipartFormData,
+                    imageFiles: imageFiles,
+                    parameters: endpoint.parameters
+                )
+
+//                if let imageFiles = imageFiles {
+//                    for (imageData, fieldName) in imageFiles {
+//                        multipartFormData.append(imageData, withName: fieldName, fileName: "image.jpg", mimeType: "image/jpeg")
+//                    }
+//                }
 
                 // Add other fields as needed
-                if let parameters = endpoint.parameters {
-                    for (key, value) in parameters {
-                        if let data = "\(value)".data(using: .utf8) {
-                            multipartFormData.append(data, withName: key)
-                        }
-                    }
-                }
+//                if let parameters = endpoint.parameters {
+//                    for (key, value) in parameters {
+//                        if let data = "\(value)".data(using: .utf8) {
+//                            multipartFormData.append(data, withName: key)
+//                        }
+//                    }
+//                }
             }, to: endpoint.fullURL, headers: endpoint.headers)
             
             var cancellable: AnyCancellable?
@@ -99,7 +122,7 @@ extension APIClient {
                 case .success(let value):
                     promise(.success((value, 1.0))) // Progress completed when the response is successful
                 case .failure(let error):
-                    print("eeeee \(error.localizedDescription)")
+                    print("eeeee \(error)")
                     promise(.failure(APIError.requestError(error)))
                 }
             }

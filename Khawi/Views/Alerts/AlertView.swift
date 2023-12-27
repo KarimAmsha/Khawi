@@ -15,7 +15,7 @@ struct AlertView: View {
             HStack {
                 Image("ic_logo")
                     .resizable()
-                    .frame(width: 50, height: 120)
+                    .frame(width: 50, height: 70)
                     .aspectRatio(1.0, contentMode: .fit)
                     .padding(16)
                 

@@ -18,7 +18,6 @@ struct PersonalInfoView: View {
     @State private var carModel = ""
     @State private var carColor = ""
     @State private var carNumber = ""
-    @State private var isFloatingPickerPresented = false
     @StateObject private var router: MainRouter
     private let errorHandling = ErrorHandling()
     @EnvironmentObject var settings: UserSettings
@@ -28,6 +27,13 @@ struct PersonalInfoView: View {
     private var isImageSelected: Bool {
         mediaPickerViewModel.selectedImage != nil
     }
+    @State private var isFloatingPickerPresented = false
+    @State private var isFloatingCarFrontImagePickerPresented = false
+    @State private var isFloatingCarBackImagePickerPresented = false
+    @State private var isFloatingCarRightImagePickerPresented = false
+    @State private var isFloatingCarLeftImagePickerPresented = false
+    @State private var isFloatingIdentityImagePickerPresented = false
+    @State private var isFloatingLicenseImagePickerPresented = false
 
     init(router: MainRouter) {
         self._router = StateObject(wrappedValue: router)
@@ -108,6 +114,50 @@ struct PersonalInfoView: View {
                                     .disabled(viewModel.isLoading)
                                 CustomTextField(text: $carNumber, placeholder: LocalizedStringKey.carNumber, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
                                     .disabled(viewModel.isLoading)
+                                
+                                VStack(spacing: 16) {
+                                    HStack(spacing: 16) {
+                                        createImageSection(image: mediaPickerViewModel.selectedCarFrontImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingCarFrontImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.carFrontImage)
+
+                                        Spacer()
+
+                                        createImageSection(image: mediaPickerViewModel.selectedCarBackImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingCarBackImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.carBackImage)
+                                    }
+
+                                    HStack(spacing: 16) {
+                                        createImageSection(image: mediaPickerViewModel.selectedCarRightImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingCarRightImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.carRightImage)
+
+                                        Spacer()
+
+                                        createImageSection(image: mediaPickerViewModel.selectedCarLeftImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingCarLeftImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.carLeftImage)
+                                    }
+
+                                    HStack(spacing: 16) {
+                                        createImageSection(image: mediaPickerViewModel.selectedIDImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingIdentityImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.identityImage)
+
+                                        Spacer()
+
+                                        createImageSection(image: mediaPickerViewModel.selectedLicanseImage,
+                                                           placeholder: "icloud.and.arrow.up",
+                                                           action: { isFloatingLicenseImagePickerPresented.toggle() },
+                                                           title: LocalizedStringKey.licenseImage)
+                                    }
+                                }
                             }
                         }
 
@@ -137,6 +187,24 @@ struct PersonalInfoView: View {
         .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingImagePicker, content: {
             ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectImage)
         })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingCarFrontImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectCarFrontImage)
+        })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingCarBackImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectCarBackImage)
+        })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingCarRightImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectCarRightImage)
+        })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingCarLeftImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectCarLeftImage)
+        })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingIDImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectIDImage)
+        })
+        .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingLicanseImagePicker, content: {
+            ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectLicanseImage)
+        })
         .popup(isPresented: $isFloatingPickerPresented) {
             FloatingPickerView(
                 isPresented: $isFloatingPickerPresented,
@@ -147,6 +215,132 @@ struct PersonalInfoView: View {
                 onTakePhoto: {
                     // Handle taking a photo here
                     mediaPickerViewModel.takePhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingCarFrontImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingCarFrontImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseCarFrontPhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeCarFrontPhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingCarBackImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingCarBackImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseCarBackPhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeCarBackPhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingCarRightImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingCarRightImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseCarRightPhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeCarRightPhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingCarLeftImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingCarLeftImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseCarLeftPhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeCarLeftPhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingIdentityImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingIdentityImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseIDPhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeIDPhoto()
+                }
+            )
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $isFloatingLicenseImagePickerPresented) {
+            FloatingPickerView(
+                isPresented: $isFloatingLicenseImagePickerPresented,
+                onChoosePhoto: {
+                    // Handle choosing a photo here
+                    mediaPickerViewModel.chooseLicensePhoto()
+                },
+                onTakePhoto: {
+                    // Handle taking a photo here
+                    mediaPickerViewModel.takeLicensePhoto()
                 }
             )
         } customize: {
@@ -170,6 +364,44 @@ struct PersonalInfoView: View {
             }
         }
     }
+    
+    private func createImageSection(image: UIImage?, placeholder: String, action: @escaping () -> Void, title: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(title)
+                .customFont(weight: .book, size: 16)
+                .foregroundColor(.grayA4ACAD())
+
+            Button(action: action) {
+                if let img = image {
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 120, height: 120) // Adjust the size as needed
+                        .background(Color.grayF9FAFA())
+                        .cornerRadius(16)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
+                        )
+                } else {
+                    Image(systemName: placeholder)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 120, height: 120) // Adjust the size as needed
+                        .foregroundColor(.gray)
+                        .font(Font.system(size: 24).weight(.light)) // Adjust the font size
+                        .padding(16)
+                        .background(Color.grayF9FAFA())
+                        .cornerRadius(16)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.grayE6E9EA(), lineWidth: 1)
+                        )
+                }
+            }
+            .disabled(viewModel.isLoading)
+        }
+    }
 }
 
 #Preview {
@@ -181,13 +413,49 @@ extension PersonalInfoView {
     
     private func register() {
         var imageData: Data? = nil
+        var imageCarFrontData: Data? = nil
+        var imageCarBackData: Data? = nil
+        var imageCarRightData: Data? = nil
+        var imageCarLeftData: Data? = nil
+        var imageIDData: Data? = nil
+        var imageLicanseData: Data? = nil
         var additionalParams: [String: Any] = [:]
 
         if isImageSelected, let uiImage = mediaPickerViewModel.selectedImage {
             // Convert the UIImage to Data, if needed
-            imageData = uiImage.jpegData(compressionQuality: 0.8)
+            imageData = uiImage.jpegData(compressionQuality: 0.5)
         }
         
+        if let uiImage = mediaPickerViewModel.selectedCarFrontImage {
+            // Convert the UIImage to Data, if needed
+            imageCarFrontData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
+        if let uiImage = mediaPickerViewModel.selectedCarBackImage {
+            // Convert the UIImage to Data, if needed
+            imageCarBackData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
+        if let uiImage = mediaPickerViewModel.selectedCarRightImage {
+            // Convert the UIImage to Data, if needed
+            imageCarRightData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
+        if let uiImage = mediaPickerViewModel.selectedCarLeftImage {
+            // Convert the UIImage to Data, if needed
+            imageCarLeftData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
+        if let uiImage = mediaPickerViewModel.selectedIDImage {
+            // Convert the UIImage to Data, if needed
+            imageIDData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
+        if let uiImage = mediaPickerViewModel.selectedLicanseImage {
+            // Convert the UIImage to Data, if needed
+            imageLicanseData = uiImage.jpegData(compressionQuality: 0.5)
+        }
+
         additionalParams = [
             "email": email,
             "full_name": name,
@@ -210,10 +478,31 @@ extension PersonalInfoView {
         }
 
         dispatchGroup.notify(queue: .main) {
-            viewModel.updateUserDataWithImage(imageData: imageData, additionalParams: additionalParams) {
-                router.replaceNavigationStack(path: [])
-                settings.loggedIn = true
+            viewModel.updateUserDataWithImage(imageData: imageData, carFrontImageData: imageCarFrontData, carBackImageData: imageCarBackData, carRightImageData: imageCarRightData, carLeftImageData: imageCarLeftData, carIDImageData: imageIDData, carLicenseImageData: imageLicanseData, additionalParams: additionalParams) { hasCar, message in
+                if !hasCar {
+                    settings.loggedIn = true
+                    router.replaceNavigationStack(path: [])
+                } else {
+                    showMessage(message: message)
+                }
             }
         }
+    }
+    
+    private func showMessage(message: String) {
+        let alertModel = AlertModel(
+            title: LocalizedStringKey.message,
+            message: message,
+            hideCancelButton: true,
+            onOKAction: {
+                router.replaceNavigationStack(path: [])
+                router.dismiss()
+            },
+            onCancelAction: {
+                router.dismiss()
+            }
+        )
+        
+        router.presentToastPopup(view: .alert(alertModel))
     }
 }
