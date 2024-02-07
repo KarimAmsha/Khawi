@@ -214,7 +214,7 @@ struct JoiningToTripView: View {
         }
         .onChange(of: ordersViewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error("", errorMessage))
+                router.presentToastPopup(view: .error("", errorMessage, .error))
             }
         }
     }

@@ -103,7 +103,7 @@ struct OrdersView: View {
         }
         .onChange(of: ordersViewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error(LocalizedStringKey.error, errorMessage))
+                router.presentToastPopup(view: .error(LocalizedStringKey.error, errorMessage, .error))
             }
         }
     }

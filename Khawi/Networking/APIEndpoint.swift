@@ -39,6 +39,8 @@ enum APIEndpoint {
     case createReferal(token: String)
     case checkCoupon(params: [String: Any], token: String)
     case notificationCount(token: String)
+    case guest
+    case deleteAccount(id: String, token: String)
 
     // Define the base API URL
     private static let baseURL = Constants.baseURL
@@ -157,26 +159,30 @@ enum APIEndpoint {
             return "/mobile/check/coupon"
         case .notificationCount:
             return "/mobile/notification/count"
+        case .guest:
+            return "/mobile/guest/token"
+        case .deleteAccount(let id, _):
+            return "/mobile/user/delete/\(id)"
         }
     }
     
     var method: HTTPMethod {
         switch self {
         case .getWelcome, .getConstants, .getUserProfile, .getConstantDetails, .map, .getOrders, .getOrderDetails, 
-                .getNotifications, .getWallet, .notificationCount:
+                .getNotifications, .getWallet, .notificationCount, .guest:
             return .get
-        case .register, .verify, .resend, .updateUserDataWithImage, .logout, .addOrder, .addOfferToOrder, .updateOfferStatus, .updateOrderStatus, .addReview, .readNotification, .addBalanceToWallet, .addComplain, .createReferal, .checkCoupon:
+        case .register, .verify, .resend, .updateUserDataWithImage, .logout, .addOrder, .addOfferToOrder, .updateOfferStatus, .updateOrderStatus, .addReview, .readNotification, .addBalanceToWallet, .addComplain, .createReferal, .checkCoupon, .deleteAccount:
             return .post
         }
     }
     
     var headers: HTTPHeaders {
         switch self {
-        case .getWelcome, .getConstants, .getConstantDetails, .register, .verify, .resend:
+        case .getWelcome, .getConstants, .getConstantDetails, .register, .verify, .resend, .guest:
             var headers = HTTPHeaders()
             headers.add(name: "Accept-Language", value: getUserPreferredLanguageCode() ?? "ar")
             return headers
-        case .getUserProfile(let token), .updateUserDataWithImage(_, _, _, _, _, _, _, _, let token), .logout(_, let token), .addOrder(_, let token), .map(_, let token), .addOfferToOrder(_, _, let token), .updateOfferStatus(_, _, let token), .updateOrderStatus(_, _, let token), .getOrders(_, _, _, token: let token), .getOrderDetails(_, let token), .addReview(_, _, let token), .getNotifications(_, _, let token), .readNotification(let token), .getWallet(_, _, let token), .addBalanceToWallet(_, let token), .addComplain(_ , let token), .createReferal(let token), .checkCoupon(_, let token), .notificationCount(let token):
+        case .getUserProfile(let token), .updateUserDataWithImage(_, _, _, _, _, _, _, _, let token), .logout(_, let token), .addOrder(_, let token), .map(_, let token), .addOfferToOrder(_, _, let token), .updateOfferStatus(_, _, let token), .updateOrderStatus(_, _, let token), .getOrders(_, _, _, token: let token), .getOrderDetails(_, let token), .addReview(_, _, let token), .getNotifications(_, _, let token), .readNotification(let token), .getWallet(_, _, let token), .addBalanceToWallet(_, let token), .addComplain(_ , let token), .createReferal(let token), .checkCoupon(_, let token), .notificationCount(let token), .deleteAccount(_, let token):
             var headers = HTTPHeaders()
             headers.add(name: "Accept-Language", value: getUserPreferredLanguageCode() ?? "ar")
             headers.add(name: "token", value: token)
@@ -186,7 +192,7 @@ enum APIEndpoint {
     
     var parameters: [String: Any]? {
         switch self {
-        case .getWelcome, .getConstants, .getConstantDetails, .getUserProfile, .logout, .map, .getOrders, .getOrderDetails, .getNotifications, .readNotification, .getWallet, .createReferal, .notificationCount:
+        case .getWelcome, .getConstants, .getConstantDetails, .getUserProfile, .logout, .map, .getOrders, .getOrderDetails, .getNotifications, .readNotification, .getWallet, .createReferal, .notificationCount, .guest, .deleteAccount:
             return nil
         case .register(let params), .verify(let params), .resend(let params), .updateUserDataWithImage(let params, _, _, _, _, _, _, _, _), .addOrder(let params, _), .addOfferToOrder(_, let params, _), .updateOfferStatus(_, let params, _), .updateOrderStatus(_, let params, _), .addReview(_, let params, _), .addBalanceToWallet(let params, _), .addComplain(let params, _), .checkCoupon(let params, _):
             return params

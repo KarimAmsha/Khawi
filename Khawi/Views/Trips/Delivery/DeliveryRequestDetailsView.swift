@@ -466,6 +466,11 @@ struct DeliveryRequestDetailsView: View {
                                 if !userHasOffer {
                                     // Present the "Make Delivery Offer" button
                                     Button {
+                                        guard let isApproved = settings.user?.isApprove, isApproved else {
+                                            viewModel.handleAPIError(.customError(message: LocalizedStringKey.reviewFromAdmin))
+                                            return
+                                        }
+                                        
                                         makeOffer()
 //                                        router.presentViewSpec(viewSpec: .deliveryOfferView(order))
                                     } label: {
@@ -534,7 +539,7 @@ struct DeliveryRequestDetailsView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error("", errorMessage))
+                router.presentToastPopup(view: .error("", errorMessage, .warning))
             }
         }
     }

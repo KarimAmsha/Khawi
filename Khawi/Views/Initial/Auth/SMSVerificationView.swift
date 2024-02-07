@@ -90,7 +90,7 @@ struct SMSVerificationView: View {
         .dismissKeyboard()
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error("", errorMessage))
+                router.presentToastPopup(view: .error("", errorMessage, .error))
             }
         }
     }
@@ -118,14 +118,10 @@ extension SMSVerificationView {
             "by": lastPathComponent
         ] as [String : Any]
 
-        viewModel.verify(params: params) { profileCompleted, isApprove in
+        viewModel.verify(params: params) { profileCompleted in
             if profileCompleted {
-                if isApprove {
-                    router.replaceNavigationStack(path: [])
-                    settings.loggedIn = true
-                } else {
-                    showMessage()
-                }
+                router.replaceNavigationStack(path: [])
+                settings.loggedIn = true
                 return
             }
             router.presentViewSpec(viewSpec: .personalInfo)
@@ -134,6 +130,7 @@ extension SMSVerificationView {
     
     private func showMessage() {
         let alertModel = AlertModel(
+            iconType: .logo,
             title: LocalizedStringKey.message,
             message: LocalizedStringKey.approvedSoon,
             hideCancelButton: true,

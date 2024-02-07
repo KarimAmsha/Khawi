@@ -306,7 +306,7 @@ class OrdersViewModel: ObservableObject {
 }
 
 extension OrdersViewModel {
-    private func handleAPIError(_ error: APIClient.APIError) {
+    func handleAPIError(_ error: APIClient.APIError) {
         let errorDescription = errorHandling.handleAPIError(error)
         errorMessage = errorDescription
     }
@@ -314,6 +314,10 @@ extension OrdersViewModel {
 
 extension OrdersViewModel {
     func loadNearbyOrders(for location: CLLocationCoordinate2D) {
+        guard let id = userSettings.id, !id.isEmpty else {
+            return
+        }
+
         let params = [
             "lat": location.latitude,
             "lng": location.longitude,
@@ -357,7 +361,7 @@ extension OrdersViewModel {
     private func updateMapAnnotations() {
         // Clear map annotations when loading new items
 //        self.mapAnnotations.removeAll()
-
+        
         // Add new map annotations
         self.mapAnnotations = self.generateMapAnnotations(for: self.nearByOrders, handleButtonTap: { _ in })
     }

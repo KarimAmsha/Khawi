@@ -42,8 +42,8 @@
 "Settings" = "الإعدادات";
 "Hello Brother" = "مرحبا خَوي";
 "Search for place" = "البحث عن مكان";
-"Joining Request" = "طلب إنشاء رحلة";
-"Delivery Request" = "طلب رحلة";
+"Joining Request" = "إنشاء رحلة";
+"Delivery Request" = "الإنضمام لرحلة";
 "Current Orders" = "الطلبات الحالية";
 "Completed Orders" = "الطلبات المكتملة";
 "Cancelled Orders" = "الطلبات الملغية";
@@ -180,3 +180,7 @@
 "Your account will be approved soon" = "سوف يتم تفعيل حسابك قريبا";
 "Call Info" = "معلومات الاتصال";
 "Click to call" = "اضغط للاتصال بالرقم";
+"Skip" = "تخطي";
+"Your request has been submitted. Your request will be reviewed by the administration" = "تم تقديم طلبك, سيتم مراجعة طلبك من قبل الادارة";
+"Delete Account" = "حذف الحساب";
+"Are you sure you want to delete your account, after account deletition, you can create and login again." = "هل انت متأكد انك تريد حذف حسابك, بعد حذف الحساب بامكانك انشاء حساب مرة اخرى والدخول مرة اخرى الى التطبيق.";

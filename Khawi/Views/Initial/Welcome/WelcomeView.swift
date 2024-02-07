@@ -13,7 +13,7 @@ struct WelcomeView: View {
     @EnvironmentObject var settings: UserSettings
     @StateObject private var router: MainRouter
     @StateObject private var viewModel = InitialViewModel(errorHandling: ErrorHandling())
-    private let errorHandling = ErrorHandling()
+    @StateObject private var authViewModel = AuthViewModel(errorHandling: ErrorHandling())
 
     init(router: MainRouter) {
         _router = StateObject(wrappedValue: router)
@@ -51,14 +51,31 @@ struct WelcomeView: View {
                 .padding(.vertical, 24)
             }
             .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        authViewModel.guest {
+                            settings.loggedIn = true
+                        }
+                    } label: {
+                        Text(LocalizedStringKey.skip)
+                    }
+                    .buttonStyle(PrimaryButton(fontSize: 14, fontWeight: .bold, background: .primary(), foreground: .white, height: 48, radius: 12))
+                }
+            }
         }
         .accentColor(.black141F1F())
         .onAppear {
             viewModel.fetchWelcomeItems()
         }
+        .onChange(of: authViewModel.errorMessage) { errorMessage in
+            if let errorMessage = errorMessage {
+                router.presentToastPopup(view: .error("", errorMessage, .error))
+            }
+        }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error("", errorMessage))
+                router.presentToastPopup(view: .error("", errorMessage, .error))
             }
         }
     }

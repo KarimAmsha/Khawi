@@ -59,7 +59,7 @@ class AuthViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func verify(params: [String: Any], onsuccess: @escaping (Bool, Bool) -> Void) {
+    func verify(params: [String: Any], onsuccess: @escaping (Bool) -> Void) {
         isLoading = true
         errorMessage = nil
         let endpoint = DataProvider.Endpoint.verify(params: params)
@@ -79,7 +79,7 @@ class AuthViewModel: ObservableObject {
                     self?.handleVerificationStatus(isVerified: response.items?.isVerify ?? false)
                     self?.errorMessage = nil
                     let profileCompleted = !(self?.user?.full_name?.isEmpty ?? false)
-                    onsuccess(profileCompleted, response.items?.isApprove ?? false)
+                    onsuccess(profileCompleted)
                 } else {
                     // Use the centralized error handling component
                     self?.handleAPIError(.customError(message: response.message))
@@ -151,6 +151,33 @@ class AuthViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    func guest(onsuccess: @escaping () -> Void) {
+        isLoading = true
+        errorMessage = nil
+        let endpoint = DataProvider.Endpoint.guest
+        
+        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<String>.self)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
+                }
+            }, receiveValue: { [weak self] (response: SingleAPIResponse<String>) in
+                if response.status {
+                    self?.errorMessage = nil
+                    UserSettings.shared.guestLogin(token: response.items ?? "")
+                    onsuccess()
+                } else {
+                    // Use the centralized error handling component
+                    self?.handleAPIError(.customError(message: response.message))
+                }
+                self?.isLoading = false
+            })
+            .store(in: &cancellables)
+    }
 
     func logoutUser(onsuccess: @escaping () -> Void) {
         guard let token = userSettings.token else {
@@ -173,6 +200,41 @@ class AuthViewModel: ObservableObject {
                 }
             }, receiveValue: { [weak self] (response: SingleAPIResponse<User>) in
                 if response.status {
+                    self?.user = response.items
+                    self?.userSettings.logout()
+                    self?.errorMessage = nil
+                    onsuccess()
+                } else {
+                    // Use the centralized error handling component
+                    self?.handleAPIError(.customError(message: response.message))
+                }
+                self?.isLoading = false
+            })
+            .store(in: &cancellables)
+    }
+    
+    func deleteAccount(onsuccess: @escaping () -> Void) {
+        guard let token = userSettings.token else {
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        let endpoint = DataProvider.Endpoint.deleteAccount(id: userSettings.id ?? "", token: token)
+        
+        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<User>.self)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
+                }
+            }, receiveValue: { [weak self] (response: SingleAPIResponse<User>) in
+                if response.status {
+                    print("2222 \(response)")
                     self?.user = response.items
                     self?.userSettings.logout()
                     self?.errorMessage = nil
@@ -214,9 +276,8 @@ extension AuthViewModel {
         }
 
         let isUserVerified = user.isVerify ?? false
-        let isUserApproved = user.isApprove ?? false
 
-        if isUserVerified && isUserApproved {
+        if isUserVerified {
             // User is both verified and approved
             UserSettings.shared.login(user: user, id: user._id ?? "", token: user.token ?? "")
         } else {

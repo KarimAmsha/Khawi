@@ -48,7 +48,7 @@ struct RegisterView: View {
                   .background(
                     Image("ic_logo")
                       .resizable()
-                      .aspectRatio(contentMode: .fill)
+                      .aspectRatio(contentMode: .fit)
                       .frame(width: 100, height: 188)
                       .clipped()
                   )
@@ -100,7 +100,7 @@ struct RegisterView: View {
                 Button {
                     Messaging.messaging().token { token, error in
                         if let error = error {
-                            router.presentToastPopup(view: .error(LocalizedStringKey.error, error.localizedDescription))
+                            router.presentToastPopup(view: .error(LocalizedStringKey.error, error.localizedDescription, .error))
                         } else if let token = token {
                             register(fcmToken: token)
                         }
@@ -164,7 +164,7 @@ struct RegisterView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error("", errorMessage))
+                router.presentToastPopup(view: .error("", errorMessage, .error))
             }
         }
     }

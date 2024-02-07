@@ -150,14 +150,23 @@ struct ErrorToastView: View {
 struct GeneralErrorToastView: View {
     let title: String
     let message: String
+    let iconType: IconType
     
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
-            Image(systemName: "xmark.circle.fill")
-                .resizable()
-                .frame(width: 48, height: 48)
-                .foregroundColor(.red)
-                .cornerRadius(24)
+            if iconType == . logo {
+                Image("ic_logo")
+                    .resizable()
+                    .frame(width: 50, height: 70)
+                    .aspectRatio(1.0, contentMode: .fit)
+                    .padding(16)
+            } else {
+                Image(systemName: iconType == .warning ? "exclamationmark.triangle" : iconType == .success ? "checkmark.circle" : "xmark.circle")
+                    .resizable()
+                    .frame(width: 48, height: 48)
+                    .foregroundColor(iconType == .warning ? Color.primary() : iconType == .success ? Color.primary() : .red)
+                    .cornerRadius(24)
+            }
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)

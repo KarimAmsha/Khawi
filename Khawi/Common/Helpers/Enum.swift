@@ -181,13 +181,20 @@ enum OfferStatus: String, Codable {
     case notAttend  = "not_attend"
 }
 
+enum IconType: String, Codable {
+    case logo
+    case success
+    case error
+    case warning
+}
+
 enum PopupView: Hashable {
     case joining(Order)
     case delivery(Order)
     case deliverySuccess(String, String)
     case joiningSuccess(String, String)
     case review(Order)
-    case error(String, String)
+    case error(String, String, IconType)
     case createJoiningSuccess(String, String)
     case createDeliverySuccess(String, String)
     case alert(AlertModel)
@@ -389,6 +396,10 @@ enum LocalizedStringKey {
     static let approvedSoon = "Your account will be approved soon".localized
     static let callInfo = "Call Info".localized
     static let clickToCall = "Click to call".localized
+    static let skip = "Skip".localized
+    static let reviewFromAdmin = "Your request has been submitted. Your request will be reviewed by the administration".localized
+    static let deleteAccount = "Delete Account".localized
+    static let deleteAccountMessage = "Are you sure you want to delete your account, after account deletition, you can create and login again.".localized
 }
 
 enum LocalizedError {

@@ -8,6 +8,7 @@
 import Foundation
 
 struct AlertModel: Hashable, Equatable {
+    let iconType: IconType
     let title: String
     let message: String
     let hideCancelButton: Bool

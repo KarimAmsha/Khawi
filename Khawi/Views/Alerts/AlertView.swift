@@ -13,11 +13,19 @@ struct AlertView: View {
     var body: some View {
         VStack(alignment: .center, spacing: 24) {
             HStack {
-                Image("ic_logo")
-                    .resizable()
-                    .frame(width: 50, height: 70)
-                    .aspectRatio(1.0, contentMode: .fit)
-                    .padding(16)
+                if alertModel.iconType == . logo {
+                    Image("ic_logo")
+                        .resizable()
+                        .frame(width: 50, height: 70)
+                        .aspectRatio(1.0, contentMode: .fit)
+                        .padding(16)
+                } else {
+                    Image(systemName: alertModel.iconType == .warning ? "exclamationmark.triangle" : alertModel.iconType == .success ? "checkmark.circle" : "xmark.circle")
+                        .resizable()
+                        .foregroundColor(alertModel.iconType == .warning ? Color.primary() : alertModel.iconType == .success ? Color.primary() : .red)
+                        .frame(width: 50, height: 50)
+                        .padding(16)
+                }
                 
                 VStack(alignment: .leading, spacing: 8) {
                     VStack(alignment: .leading, spacing: 8) {

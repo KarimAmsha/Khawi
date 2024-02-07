@@ -310,7 +310,7 @@ struct NewDeliveryRequestView: View {
         }
         .onChange(of: ordersViewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error("", errorMessage))
+                router.presentToastPopup(view: .error("", errorMessage, .error))
             }
         }
     }
@@ -350,6 +350,7 @@ struct NewDeliveryRequestView: View {
 extension NewDeliveryRequestView {
     private func showAlertView() {
         let alertModel = AlertModel(
+            iconType: .logo,
             title: LocalizedStringKey.message,
             message: LocalizedStringKey.agreeOnTerms, 
             hideCancelButton: false,

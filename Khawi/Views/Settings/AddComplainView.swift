@@ -89,7 +89,7 @@ struct AddComplainView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error("", errorMessage))
+                router.presentToastPopup(view: .error("", errorMessage, .error))
             }
         }
         .onAppear {
@@ -120,6 +120,7 @@ extension AddComplainView {
     
     func showMessage(message: String) {
         let alertModel = AlertModel(
+            iconType: .logo,
             title: LocalizedStringKey.message,
             message: message,
             hideCancelButton: true,

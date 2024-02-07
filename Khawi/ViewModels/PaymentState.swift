@@ -67,9 +67,9 @@ class PaymentState: ObservableObject {
         theme.buttonFontColor = .black
         theme.backButtonColor = .black
 
-        return PaymentSDKConfiguration(profileID: "88646",
-                                       serverKey: "SZJN2DKWTG-JDHMTD6T2L-KZJKMN6GKH",
-                                       clientKey: "C7KMQQ-R7BR6D-HN7DG7-KQKMRQ",
+        return PaymentSDKConfiguration(profileID: "94514",
+                                       serverKey: "SKJN2DKWTD-JGLHWBTNWK-JKMJHJW2ZD",
+                                       clientKey: "CRKMQQ-R77P6T-BHV27Q-TV2RN2",
                                        currency: "SAR",
                                        amount: amount,
                                        merchantCountryCode: "SA")
@@ -77,14 +77,14 @@ class PaymentState: ObservableObject {
                 .cartID("1234")
                 .screenTitle(LocalizedStringKey.addAccount)
                 .theme(theme)
-                .billingDetails(PaymentSDKBillingDetails(name: "John Smith",
-                                         email: "email@test.com",
-                                         phone: "+97311111111",
-                                         addressLine: "Street1",
-                                         city: "Riyad",
-                                         state: "Riyad",
-                                         countryCode: "sa",
-                                         zip: "12345"))
+                .billingDetails(PaymentSDKBillingDetails(name: userSettings.user?.full_name ?? "",
+                                                         email: userSettings.user?.email ?? "",
+                                                         phone: userSettings.user?.phone_number ?? "",
+                                                         addressLine: userSettings.user?.address ?? "",
+                                                         city: "Riyad",
+                                                         state: "Riyad",
+                                                         countryCode: "sa",
+                                                         zip: "12345"))
     }
     
     func topMostViewController() -> UIViewController {

@@ -393,7 +393,7 @@ struct EditProfileView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error("", errorMessage))
+                router.presentToastPopup(view: .error("", errorMessage, .error))
             }
         }
     }
@@ -558,28 +558,22 @@ extension EditProfileView {
         dispatchGroup.notify(queue: .main) {
             viewModel.updateUserDataWithImage(imageData: imageData, carFrontImageData: imageCarFrontData, carBackImageData: imageCarBackData, carRightImageData: imageCarRightData, carLeftImageData: imageCarLeftData, carIDImageData: imageIDData, carLicenseImageData: imageLicanseData, additionalParams: additionalParams) { hasCar, message in
                 if !hasCar {
-                    showMessage(message: LocalizedStringKey.successfullyUpdated)
+                    showMessage(message: LocalizedStringKey.successfullyUpdated, icon: .logo)
                 } else {
-                    showMessage(message: message)
+                    showMessage(message: LocalizedStringKey.reviewFromAdmin, icon: .warning)
                 }
-
             }
         }
     }
     
-    private func showMessage(message: String) {
+    private func showMessage(message: String, icon: IconType) {
         let alertModel = AlertModel(
+            iconType: icon,
             title: LocalizedStringKey.message,
             message: message,
             hideCancelButton: true,
             onOKAction: {
-                if hasCar {
-                    router.navigateBack()
-                    authViewModel.logoutUser {
-                    }
-                } else {
-                    router.navigateBack()
-                }
+                router.navigateBack()
                 router.dismiss()
             },
             onCancelAction: {

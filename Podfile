@@ -7,5 +7,8 @@ target 'Khawi' do
 
   # Pods for Khawi
 #  pod 'PayTabsSDK', '~> 6.4.12'
+pod 'goSellSDK'
+#pod 'goSellSDK/ErrorReporting'
+
 end
 

@@ -44,12 +44,19 @@ struct MainView: View {
                         ZStack {
                             if showPopUp {
                                 PlusMenu(widthAndHeight: 47, appState: appState, showPopUp: $showPopUp, onJoiningRequest: {
-                                    if settings.user?.hasCar ?? true {
+                                    guard let hasCar = settings.user?.hasCar, let isApprove = settings.user?.isApprove else {
+                                        // Handle the case when user or user properties are nil
+                                        return
+                                    }
+
+                                    if hasCar && isApprove {
                                         router.presentViewSpec(viewSpec: .newJoinRequest)
                                     } else {
+                                        let message = !hasCar ?  LocalizedStringKey.youDontHaveCar: LocalizedStringKey.reviewFromAdmin
                                         let alertModel = AlertModel(
+                                            iconType: .warning,
                                             title: LocalizedStringKey.message,
-                                            message: LocalizedStringKey.youDontHaveCar,
+                                            message: message,
                                             hideCancelButton: true,
                                             onOKAction: {
                                                 router.dismiss()

@@ -29,6 +29,7 @@
 		1E5A63DC2B053A8500237B7B /* NotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5A63DB2B053A8500237B7B /* NotificationHandler.swift */; };
 		1E5A63DE2B05618400237B7B /* Complain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5A63DD2B05618400237B7B /* Complain.swift */; };
 		1E5A63E02B0562B300237B7B /* AddComplainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5A63DF2B0562B300237B7B /* AddComplainView.swift */; };
+		1E72F3E62B58005600A3A692 /* PaymentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E72F3E52B58005600A3A692 /* PaymentViewModel.swift */; };
 		1E88CE3B2B0623A1005540F9 /* NSNotification+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E88CE3A2B0623A1005540F9 /* NSNotification+Extensions.swift */; };
 		1E8953532AF84215004E3B62 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8953522AF84215004E3B62 /* Constants.swift */; };
 		1E922A772AE46C2D002BE670 /* LanguageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E922A762AE46C2D002BE670 /* LanguageManager.swift */; };
@@ -239,6 +240,7 @@
 		1E5A63DB2B053A8500237B7B /* NotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationHandler.swift; sourceTree = "<group>"; };
 		1E5A63DD2B05618400237B7B /* Complain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Complain.swift; sourceTree = "<group>"; };
 		1E5A63DF2B0562B300237B7B /* AddComplainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddComplainView.swift; sourceTree = "<group>"; };
+		1E72F3E52B58005600A3A692 /* PaymentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentViewModel.swift; sourceTree = "<group>"; };
 		1E88CE3A2B0623A1005540F9 /* NSNotification+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotification+Extensions.swift"; sourceTree = "<group>"; };
 		1E8953522AF84215004E3B62 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		1E922A762AE46C2D002BE670 /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
@@ -674,6 +676,7 @@
 				1EE9E7E52AFFF42300187310 /* MapViewModel.swift */,
 				1E5A63DB2B053A8500237B7B /* NotificationHandler.swift */,
 				1E4E9B182B383540006D0DD0 /* MapSearch.swift */,
+				1E72F3E52B58005600A3A692 /* PaymentViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -923,6 +926,7 @@
 				1EC9668B2AE1556A004AC852 /* Resources */,
 				1E4B60162B039C8900FDFD4A /* Embed Frameworks */,
 				1E88CE3C2B062C11005540F9 /* ShellScript */,
+				B0DDB40F5FAF48D8122F8464 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1075,6 +1079,23 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		B0DDB40F5FAF48D8122F8464 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Khawi/Pods-Khawi-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Khawi/Pods-Khawi-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Khawi/Pods-Khawi-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1215,6 +1236,7 @@
 				1EEA1CE82AE5A4F40026F092 /* Toasts.swift in Sources */,
 				1EEA1C7B2AE586E60026F092 /* User.swift in Sources */,
 				1EB9B6E02AEC88020032DC99 /* SettingsView.swift in Sources */,
+				1E72F3E62B58005600A3A692 /* PaymentViewModel.swift in Sources */,
 				1EEA1C772AE585A20026F092 /* UserSettings.swift in Sources */,
 				1EC966E62AE1DDFF004AC852 /* WelcomeControlDots.swift in Sources */,
 				1EE0D85D2AEAF54D003EA9B3 /* PathStore.swift in Sources */,
@@ -1288,7 +1310,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1352,7 +1374,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1381,7 +1403,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"Khawi/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
@@ -1389,9 +1411,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Khawi/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Khawi will use camera to upload user photo";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Khawi will use location to track user location";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Khawi will use location to track user location";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Khawi will use location to track user location";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Khawi will use photo library to upload user photo";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Khawi will use photo library to upload user photo";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -1408,10 +1430,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.Fazaa.Khawi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Khawi_Dist;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Kh_Dist;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -1425,7 +1450,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"Khawi/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
@@ -1433,9 +1458,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Khawi/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Khawi will use camera to upload user photo";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Khawi will use location to track user location";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Khawi will use location to track user location";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Khawi will use location to track user location";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Khawi will use photo library to upload user photo";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Khawi will use photo library to upload user photo";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -1452,10 +1477,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.Fazaa.Khawi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Khawi_Dist;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Kh_Dist;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

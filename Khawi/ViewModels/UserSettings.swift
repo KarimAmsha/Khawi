@@ -56,6 +56,14 @@ class UserSettings: ObservableObject {
         saveUserToStorage(user: user, id: id, token: token)
     }
     
+    func guestLogin(token: String) {
+        self.user = nil
+        self.id = nil
+        self.token = token
+        loggedIn = true
+        saveTokenToStorage(token: token)
+    }
+
     func logout() {
         loggedIn = false
     }
@@ -76,6 +84,10 @@ class UserSettings: ObservableObject {
             UserDefaults.standard.set(id, forKey: Keys.id)
             UserDefaults.standard.set(token, forKey:  Keys.token)
         }
+    }
+    
+    private func saveTokenToStorage(token: String) {
+        UserDefaults.standard.set(token, forKey:  Keys.token)
     }
     
     private func clearUserStorage() {

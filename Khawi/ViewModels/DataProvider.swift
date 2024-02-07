@@ -40,6 +40,8 @@ class DataProvider {
         case createReferal(token : String)
         case checkCoupon(params: [String: Any], token: String)
         case notificationCount(token: String)
+        case guest
+        case deleteAccount(id: String, token: String)
 
         // Map your custom Endpoint to APIEndpoint
         func toAPIEndpoint() -> APIEndpoint {
@@ -94,6 +96,10 @@ class DataProvider {
                 return .checkCoupon(params: params, token: token)
             case .notificationCount(token: let token):
                 return .notificationCount(token: token)
+            case .guest:
+                return .guest
+            case .deleteAccount(let id, let token):
+                return .deleteAccount(id: id, token: token)
             }
         }
     }

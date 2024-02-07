@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PaymentSDK
+import goSellSDK
 
 struct AddBalanceView: View {
     @State private var coupon = ""
@@ -17,7 +18,8 @@ struct AddBalanceView: View {
     @Binding var showAddBalanceView: Bool
     var onsuccess: () -> Void
     @StateObject private var paymentState = PaymentState(errorHandling: ErrorHandling())
-    
+    @StateObject private var viewModel = PaymentViewModel()
+
     init(showAddBalanceView: Binding<Bool>, router: MainRouter, onsuccess: @escaping () -> Void) {
         _showAddBalanceView = showAddBalanceView
         _router = StateObject(wrappedValue: router)
@@ -44,6 +46,19 @@ struct AddBalanceView: View {
                 LoadingView()
             }
 
+//            VStack {
+//                Button("Start Payment") {
+//                    viewModel.startPayment()
+//                }
+//                .padding()
+//                .foregroundColor(.white)
+//                .background(Color.blue)
+//                .cornerRadius(10)
+//
+//                Spacer()
+//            }
+//            .padding()
+
             Button {
                 checkCoupon()
             } label: {
@@ -59,12 +74,15 @@ struct AddBalanceView: View {
         .alert(isPresented: $showAlert) {
             Alert(title: Text(LocalizedStringKey.error), message: Text(alertMessage), dismissButton: .default(Text(LocalizedStringKey.ok)))
         }
-        .onChange(of: paymentState.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error(LocalizedStringKey.error, errorMessage))
+        .onAppear {
+            GoSellSDK.mode = .production
+        }
+        .onChange(of: viewModel.errorMessage) { errorMessage in
+            if !errorMessage.isEmpty {
+                router.presentToastPopup(view: .error(LocalizedStringKey.error, errorMessage, .error))
             }
         }
-        .onChange(of: paymentState.paymentSuccess) { paymentSuccess in
+        .onChange(of: viewModel.paymentSuccess) { paymentSuccess in
             // Do something when payment is successful
             if paymentSuccess {
                 addBalance()
@@ -94,7 +112,9 @@ extension AddBalanceView {
     }
     
     func startPayment(amount: Double) {
-        paymentState.startCardPayment(amount: amount)
+        viewModel.updateAmount(amount.toString())
+        viewModel.startPayment()
+//        paymentState.startCardPayment(amount: amount)
     }
     
     func addBalance() {

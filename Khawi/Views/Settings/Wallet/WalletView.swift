@@ -136,7 +136,7 @@ struct WalletView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error(LocalizedStringKey.error, errorMessage))
+                router.presentToastPopup(view: .error(LocalizedStringKey.error, errorMessage, .error))
             }
         }
     }

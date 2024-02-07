@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseDynamicLinks
+import PopupView
 
 struct SettingsView: View {
     @StateObject var settings: UserSettings
@@ -16,6 +17,9 @@ struct SettingsView: View {
     @StateObject private var authViewModel = AuthViewModel(errorHandling: ErrorHandling())
     let appURL = URL(string: "https://www.example.com")
     @State private var referralCode: String?
+    @State private var showInviteFriends = false
+    @State private var showLogout = false
+    @State private var showDelete = false
 
     init(settings: UserSettings, router: MainRouter) {
         _settings = StateObject(wrappedValue: settings)
@@ -188,7 +192,7 @@ struct SettingsView: View {
                     }
                     
                     Button {
-                        logout()
+                        showLogout = true
                     } label: {
                         HStack(spacing: 26) {
                             Image("ic_logout")
@@ -197,6 +201,26 @@ struct SettingsView: View {
                                 .padding(20)
                                 .background(Color.yellowFFFCF6().clipShape(Circle()))
                             Text(LocalizedStringKey.logout)
+                                .customFont(weight: .book, size: 16)
+                                .foregroundColor(.black141F1F())
+                            Spacer()
+                            Image(systemName: "chevron.left")
+                                .resizable()
+                                .foregroundColor(.grayA4ACAD())
+                                .frame(width: 10, height: 16)
+                        }
+                    }
+
+                    Button {
+                        showDelete = true
+                    } label: {
+                        HStack(spacing: 26) {
+                            Image("ic_logout")
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                                .padding(20)
+                                .background(Color.yellowFFFCF6().clipShape(Circle()))
+                            Text(LocalizedStringKey.deleteAccount)
                                 .customFont(weight: .book, size: 16)
                                 .foregroundColor(.black141F1F())
                             Spacer()
@@ -224,6 +248,58 @@ struct SettingsView: View {
                 }
             }
         }
+        .popup(isPresented: $showLogout) {
+            let alertModel = AlertModel(
+                iconType: .logo,
+                title: LocalizedStringKey.logout,
+                message: LocalizedStringKey.logoutMessage,
+                hideCancelButton: false,
+                onOKAction: {
+                    showLogout = false
+                    authViewModel.logoutUser {
+                    }
+                },
+                onCancelAction: {
+                    showLogout = false
+                }
+            )
+            
+            AlertView(alertModel: alertModel)
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
+        .popup(isPresented: $showDelete) {
+            let alertModel = AlertModel(
+                iconType: .logo,
+                title: LocalizedStringKey.deleteAccount,
+                message: LocalizedStringKey.deleteAccountMessage,
+                hideCancelButton: false,
+                onOKAction: {
+                    authViewModel.deleteAccount {
+                        showDelete = false
+                    }
+                },
+                onCancelAction: {
+                    showDelete = false
+                }
+            )
+            
+            AlertView(alertModel: alertModel)
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.5))
+        }
         .onAppear {
             getConstants()
         }
@@ -235,23 +311,6 @@ struct SettingsView: View {
 }
 
 extension SettingsView {
-    private func logout() {
-        let alertModel = AlertModel(
-            title: LocalizedStringKey.logout,
-            message: LocalizedStringKey.logoutMessage,
-            hideCancelButton: false,
-            onOKAction: {
-                authViewModel.logoutUser {
-                }
-            },
-            onCancelAction: {
-                router.dismiss()
-            }
-        )
-        
-        router.presentToastPopup(view: .alert(alertModel))
-    }
-    
     private func getConstants() {
         initialViewModel.fetchConstantsItems()
     }
@@ -294,7 +353,6 @@ extension SettingsView {
     
     private func createReferal() {
         authViewModel.createReferal {
-            print(authViewModel.referal)
             if let url = authViewModel.referal?.shortLink?.toURL() {
                 shareReferralLink(url)
             }

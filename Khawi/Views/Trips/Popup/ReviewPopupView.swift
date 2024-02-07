@@ -86,7 +86,7 @@ struct ReviewPopupView: View {
         .cornerRadius(16, corners: [.topLeft, .topRight])
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                router.presentToastPopup(view: .error("", errorMessage))
+                router.presentToastPopup(view: .error("", errorMessage, .error))
             }
         }
     }
@@ -111,6 +111,7 @@ extension ReviewPopupView {
     
     func showMessage(message: String) {
         let alertModel = AlertModel(
+            iconType: .logo,
             title: "",
             message: message,
             hideCancelButton: true,

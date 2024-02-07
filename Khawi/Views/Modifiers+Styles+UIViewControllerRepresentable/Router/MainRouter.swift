@@ -74,8 +74,8 @@ private extension MainRouter {
                 SuccessJoiningRequestView(orderID: orderID, message: message, router: self)
             case .review(let order):
                 ReviewPopupView(order: order, settings: settings, router: self)
-            case .error(let title, let message):
-                GeneralErrorToastView(title: title, message: message)
+            case .error(let title, let message, let iconType):
+                GeneralErrorToastView(title: title, message: message, iconType: iconType)
             case .createJoiningSuccess(let orderID, let message):
                 JoinRequestSuccessView(orderID: orderID, message: message, router: self)
             case .createDeliverySuccess(let orderID, let message):
