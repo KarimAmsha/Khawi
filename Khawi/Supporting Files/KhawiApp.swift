@@ -13,6 +13,7 @@ import goSellSDK
 
 @main
 struct KhawiApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject var languageManager = LanguageManager()
     @StateObject var appState = AppState()
     @StateObject private var authViewModel = AuthViewModel(errorHandling: ErrorHandling())
@@ -37,6 +38,71 @@ struct KhawiApp: App {
                 .environmentObject(notificationHandler)
                 .preferredColorScheme(.light)
         }
+    }
+}
+
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        GoSellSDK.secretKey = SecretKey(sandbox:    "sk_test_O376xkqA0CoaptSIzK5jDvfh",
+                                        production:    "sk_live_ZxLAYioI4VMcg51a6J2WSBs7")
+
+        configureNotifications(application)
+        Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(true)
+        return true
+    }
+
+    func configureNotifications(_ application:UIApplication){
+        Messaging.messaging().delegate = self
+
+        UNUserNotificationCenter.current().delegate = self
+        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+        UNUserNotificationCenter.current().requestAuthorization(
+            options: authOptions,
+            completionHandler: {(granted, error) in })
+        application.registerForRemoteNotifications()
+    }
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    //Receive displayed notifications for iOS 10 devices.
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.banner, .badge, .sound])
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+
+        if let userInfo = response.notification.request.content.userInfo as? [String: Any] {
+            NotificationHandler.shared.handleRemoteNotification(userInfo: userInfo)
+            completionHandler()
+        }
+    }
+}
+
+extension AppDelegate : MessagingDelegate {
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        NotificationHandler.shared.handleRemoteNotification(userInfo: userInfo)
+        completionHandler(UIBackgroundFetchResult.newData)
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) { }
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        Messaging.messaging().apnsToken = deviceToken
+    }
+
+
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+//        print(fcmToken)
+    }
+
+    func messaging(_ messaging: Messaging, didRefreshRegistrationToken fcmToken: String) {
+        Messaging.messaging().isAutoInitEnabled = true
     }
 }
 
