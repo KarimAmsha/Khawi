@@ -8,7 +8,7 @@
 import Foundation
 import Alamofire
 import Firebase
-import Firebase
+import FirebaseStorage
 
 struct Constants {
     static let baseURL = "https://khawii-598d2a7a9203.herokuapp.com/api"
@@ -17,6 +17,8 @@ struct Constants {
     static let serverkey            = "AAAAZ8ldFPY:APA91bE3eeL5kCX28ZElBjeobvkMORu7Hb7SQjXrZuI_pZMGgPOUOjiQyb1Fskb2BfUln-6bP6cBOsnrGJoybdUlCofzqQjMR4Z-8oBy52xGFXOfLj7-T6vfR9DuZym24OZ4EZ2krBfn"
     static let headers: HTTPHeaders = ["Authorization":"key = \(serverkey)", "Accept": "application/json"]
     static let dbRef                = Database.database().reference()
+    static var StorageRef           = Storage.storage().reference()
+    static let imageStorage         = StorageRef.child("images")
     static let usersRef             = dbRef.child("user")
     static let userLocationRef      = dbRef.child("userLocation")
     static let trackingRef          = dbRef.child("tracking")

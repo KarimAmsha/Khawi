@@ -35,7 +35,7 @@ class UserViewModel: ObservableObject {
         isLoading = false
     }
 
-    func updateUserDataWithImage(imageData: Data?, carFrontImageData: Data?, carBackImageData: Data?, carRightImageData: Data?, carLeftImageData: Data?, carIDImageData: Data?, carLicenseImageData: Data?, additionalParams: [String: Any], onsuccess: @escaping (Bool, String) -> Void) {
+    func updateUserDataWithImage(additionalParams: [String: Any], onsuccess: @escaping (Bool, String) -> Void) {
         guard let token = userSettings.token else {
             self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
             return
@@ -44,58 +44,97 @@ class UserViewModel: ObservableObject {
         self.updateUploadProgress(newProgress: 0)
         startUpload()
 
-        let imageFiles = [
-            (imageData, "image"),
-            (carFrontImageData, "carFrontImage"),
-            (carBackImageData, "carBackImage"),
-            (carRightImageData, "carRightImage"),
-            (carLeftImageData, "carLeftImage"),
-            (carIDImageData, "identityImage"),
-            (carLicenseImageData, "licenseImage")
-        ].compactMap { (data, fieldName) in
-            data.map { ($0, fieldName) } // Unwrap optional Data and create tuple
-        }
-
         let endpoint: DataProvider.Endpoint = .updateUserDataWithImage(
             params: additionalParams,
-            imageData: imageData,
-            carFrontImageData: carFrontImageData,
-            carBackImageData: carBackImageData,
-            carRightImageData: carRightImageData,
-            carLeftImageData: carLeftImageData,
-            carIDImageData: carIDImageData,
-            carLicanseImageData: carLicenseImageData,
             token: token
         )
 
-        dataProvider.requestMultipart(endpoint: endpoint, imageFiles: imageFiles, responseType: SingleAPIResponse<User>.self)
-            .sink(receiveCompletion: { [weak self] completion in
+        dataProvider.request(endpoint: endpoint, responseType: SingleAPIResponse<User>.self)
+            .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    self?.updateUploadProgress(newProgress: 1.0) // Set progress to 100% when the upload is complete
-                    self?.finishUpload()
+                    break
                 case .failure(let error):
-                    // Handle the error
-                    self?.handleAPIError(error)
-                    self?.finishUpload()
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
                 }
-            }, receiveValue: { (response, uploadProgress) in
+            }, receiveValue: { [weak self] (response: SingleAPIResponse<User>) in
                 if response.status {
                     // Handle the successful response, if needed
-                    self.updateUploadProgress(newProgress: uploadProgress) // The upload progress (0.0 to 1.0)
-                    self.user = response.items // The user object
-                    self.handleVerificationStatus(isVerified: response.items?.isVerify ?? false)
-                    self.handleUserData()
-                    self.errorMessage = nil
-                    onsuccess((self.user?.hasCar ?? false) ? true : false, (self.user?.hasCar ?? false) ? response.message : "")
+                    self?.user = response.items // The user object
+                    self?.handleVerificationStatus(isVerified: response.items?.isVerify ?? false)
+                    self?.handleUserData()
+                    self?.errorMessage = nil
+                    onsuccess((self?.user?.hasCar ?? false) ? true : false, (self?.user?.hasCar ?? false) ? response.message : "")
                 } else {
                     // Use the centralized error handling component
-                    self.handleAPIError(.customError(message: response.message))
+                    self?.handleAPIError(.customError(message: response.message))
                 }
-
             })
             .store(in: &cancellables)
     }
+
+//    func updateUserDataWithImage(imageData: Data?, carFrontImageData: Data?, carBackImageData: Data?, carRightImageData: Data?, carLeftImageData: Data?, carIDImageData: Data?, carLicenseImageData: Data?, additionalParams: [String: Any], onsuccess: @escaping (Bool, String) -> Void) {
+//        guard let token = userSettings.token else {
+//            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+//            return
+//        }
+//        
+//        self.updateUploadProgress(newProgress: 0)
+//        startUpload()
+//
+//        let imageFiles = [
+//            (imageData, "image"),
+//            (carFrontImageData, "carFrontImage"),
+//            (carBackImageData, "carBackImage"),
+//            (carRightImageData, "carRightImage"),
+//            (carLeftImageData, "carLeftImage"),
+//            (carIDImageData, "identityImage"),
+//            (carLicenseImageData, "licenseImage")
+//        ].compactMap { (data, fieldName) in
+//            data.map { ($0, fieldName) } // Unwrap optional Data and create tuple
+//        }
+//
+//        let endpoint: DataProvider.Endpoint = .updateUserDataWithImage(
+//            params: additionalParams,
+//            imageData: imageData,
+//            carFrontImageData: carFrontImageData,
+//            carBackImageData: carBackImageData,
+//            carRightImageData: carRightImageData,
+//            carLeftImageData: carLeftImageData,
+//            carIDImageData: carIDImageData,
+//            carLicanseImageData: carLicenseImageData,
+//            token: token
+//        )
+//
+//        dataProvider.requestMultipart(endpoint: endpoint, imageFiles: imageFiles, responseType: SingleAPIResponse<User>.self)
+//            .sink(receiveCompletion: { [weak self] completion in
+//                switch completion {
+//                case .finished:
+//                    self?.updateUploadProgress(newProgress: 1.0) // Set progress to 100% when the upload is complete
+//                    self?.finishUpload()
+//                case .failure(let error):
+//                    // Handle the error
+//                    self?.handleAPIError(error)
+//                    self?.finishUpload()
+//                }
+//            }, receiveValue: { (response, uploadProgress) in
+//                if response.status {
+//                    // Handle the successful response, if needed
+//                    self.updateUploadProgress(newProgress: uploadProgress) // The upload progress (0.0 to 1.0)
+//                    self.user = response.items // The user object
+//                    self.handleVerificationStatus(isVerified: response.items?.isVerify ?? false)
+//                    self.handleUserData()
+//                    self.errorMessage = nil
+//                    onsuccess((self.user?.hasCar ?? false) ? true : false, (self.user?.hasCar ?? false) ? response.message : "")
+//                } else {
+//                    // Use the centralized error handling component
+//                    self.handleAPIError(.customError(message: response.message))
+//                }
+//
+//            })
+//            .store(in: &cancellables)
+//    }
     
     func fetchUserData(onsuccess: @escaping () -> Void) {
         guard let token = userSettings.token else {
@@ -196,7 +235,7 @@ class UserViewModel: ObservableObject {
 }
 
 extension UserViewModel {
-    private func handleAPIError(_ error: APIClient.APIError) {
+    func handleAPIError(_ error: APIClient.APIError) {
         let errorDescription = errorHandling.handleAPIError(error)
         errorMessage = errorDescription
     }

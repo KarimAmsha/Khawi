@@ -21,7 +21,7 @@ class DataProvider {
         case register(params: [String: Any])
         case verify(params: [String: Any])
         case resend(params: [String: Any])
-        case updateUserDataWithImage(params: [String: Any], imageData: Data?, carFrontImageData: Data?, carBackImageData: Data?, carRightImageData: Data?, carLeftImageData: Data?, carIDImageData: Data?, carLicanseImageData: Data?, token: String)
+        case updateUserDataWithImage(params: [String: Any], token: String)
         case getUserProfile(token: String)
         case logout(userID: String, token: String)
         case addOrder(params: [String: Any], token: String)
@@ -58,8 +58,8 @@ class DataProvider {
                 return .verify(params: params)
             case .resend(let params):
                 return .resend(params: params)
-            case .updateUserDataWithImage(let params, let imageData, let carFrontImageData, let carBackImageData, let carRightImageData, let carLeftImageData, let carIDImageData, let carLicanseImageData, let token):
-                return .updateUserDataWithImage(params: params, imageData: imageData, carFrontImageData: carFrontImageData, carBackImageData: carBackImageData, carRightImageData: carRightImageData, carLeftImageData: carLeftImageData, carIDImageData: carIDImageData, carLicanseImageData: carLicanseImageData, token: token)
+            case .updateUserDataWithImage(let params, let token):
+                return .updateUserDataWithImage(params: params, token: token)
             case .getUserProfile(let token):
                 return .getUserProfile(token: token)
             case .logout(let userID, let token):

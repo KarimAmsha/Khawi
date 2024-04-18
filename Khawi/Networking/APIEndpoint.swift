@@ -20,7 +20,7 @@ enum APIEndpoint {
     case register(params: [String: Any])
     case verify(params: [String: Any])
     case resend(params: [String: Any])
-    case updateUserDataWithImage(params: [String: Any], imageData: Data?, carFrontImageData: Data?, carBackImageData: Data?, carRightImageData: Data?, carLeftImageData: Data?, carIDImageData: Data?, carLicanseImageData: Data?, token: String)
+    case updateUserDataWithImage(params: [String: Any], token: String)
     case getUserProfile(token: String)
     case logout(userID: String, token: String)
     case addOrder(params: [String: Any], token: String)
@@ -182,7 +182,7 @@ enum APIEndpoint {
             var headers = HTTPHeaders()
             headers.add(name: "Accept-Language", value: getUserPreferredLanguageCode() ?? "ar")
             return headers
-        case .getUserProfile(let token), .updateUserDataWithImage(_, _, _, _, _, _, _, _, let token), .logout(_, let token), .addOrder(_, let token), .map(_, let token), .addOfferToOrder(_, _, let token), .updateOfferStatus(_, _, let token), .updateOrderStatus(_, _, let token), .getOrders(_, _, _, token: let token), .getOrderDetails(_, let token), .addReview(_, _, let token), .getNotifications(_, _, let token), .readNotification(let token), .getWallet(_, _, let token), .addBalanceToWallet(_, let token), .addComplain(_ , let token), .createReferal(let token), .checkCoupon(_, let token), .notificationCount(let token), .deleteAccount(_, let token):
+        case .getUserProfile(let token), .updateUserDataWithImage(_, let token), .logout(_, let token), .addOrder(_, let token), .map(_, let token), .addOfferToOrder(_, _, let token), .updateOfferStatus(_, _, let token), .updateOrderStatus(_, _, let token), .getOrders(_, _, _, token: let token), .getOrderDetails(_, let token), .addReview(_, _, let token), .getNotifications(_, _, let token), .readNotification(let token), .getWallet(_, _, let token), .addBalanceToWallet(_, let token), .addComplain(_ , let token), .createReferal(let token), .checkCoupon(_, let token), .notificationCount(let token), .deleteAccount(_, let token):
             var headers = HTTPHeaders()
             headers.add(name: "Accept-Language", value: getUserPreferredLanguageCode() ?? "ar")
             headers.add(name: "token", value: token)
@@ -194,7 +194,7 @@ enum APIEndpoint {
         switch self {
         case .getWelcome, .getConstants, .getConstantDetails, .getUserProfile, .logout, .map, .getOrders, .getOrderDetails, .getNotifications, .readNotification, .getWallet, .createReferal, .notificationCount, .guest, .deleteAccount:
             return nil
-        case .register(let params), .verify(let params), .resend(let params), .updateUserDataWithImage(let params, _, _, _, _, _, _, _, _), .addOrder(let params, _), .addOfferToOrder(_, let params, _), .updateOfferStatus(_, let params, _), .updateOrderStatus(_, let params, _), .addReview(_, let params, _), .addBalanceToWallet(let params, _), .addComplain(let params, _), .checkCoupon(let params, _):
+        case .register(let params), .verify(let params), .resend(let params), .updateUserDataWithImage(let params, _), .addOrder(let params, _), .addOfferToOrder(_, let params, _), .updateOfferStatus(_, let params, _), .updateOrderStatus(_, let params, _), .addReview(_, let params, _), .addBalanceToWallet(let params, _), .addComplain(let params, _), .checkCoupon(let params, _):
             return params
         }
     }

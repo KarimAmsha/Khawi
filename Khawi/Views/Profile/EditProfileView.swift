@@ -187,9 +187,8 @@ struct EditProfileView: View {
 
                         Spacer()
                         
-                        if let uploadProgress = viewModel.uploadProgress {
-                            // Display the progress view only when upload is in progress
-                            LinearProgressView(LocalizedStringKey.loading, progress: uploadProgress, color: .primary())
+                        if viewModel.isLoading {
+                            LoadingView()
                         }
 
                         Button {
@@ -490,48 +489,12 @@ extension EditProfileView {
     }
     
     private func update() {
-        var imageData: Data? = nil
-        var imageCarFrontData: Data? = nil
-        var imageCarBackData: Data? = nil
-        var imageCarRightData: Data? = nil
-        var imageCarLeftData: Data? = nil
-        var imageIDData: Data? = nil
-        var imageLicanseData: Data? = nil
+        var profile: UIImage? = nil
         var additionalParams: [String: Any] = [:]
 
         if isImageSelected, let uiImage = mediaPickerViewModel.selectedImage {
             // Convert the UIImage to Data, if needed
-            imageData = uiImage.jpegData(compressionQuality: 0.6)
-        }
-        
-        if let uiImage = mediaPickerViewModel.selectedCarFrontImage {
-            // Convert the UIImage to Data, if needed
-            imageCarFrontData = uiImage.jpegData(compressionQuality: 0.5)
-        }
-
-        if let uiImage = mediaPickerViewModel.selectedCarBackImage {
-            // Convert the UIImage to Data, if needed
-            imageCarBackData = uiImage.jpegData(compressionQuality: 0.5)
-        }
-
-        if let uiImage = mediaPickerViewModel.selectedCarRightImage {
-            // Convert the UIImage to Data, if needed
-            imageCarRightData = uiImage.jpegData(compressionQuality: 0.5)
-        }
-
-        if let uiImage = mediaPickerViewModel.selectedCarLeftImage {
-            // Convert the UIImage to Data, if needed
-            imageCarLeftData = uiImage.jpegData(compressionQuality: 0.5)
-        }
-
-        if let uiImage = mediaPickerViewModel.selectedIDImage {
-            // Convert the UIImage to Data, if needed
-            imageIDData = uiImage.jpegData(compressionQuality: 0.5)
-        }
-
-        if let uiImage = mediaPickerViewModel.selectedLicanseImage {
-            // Convert the UIImage to Data, if needed
-            imageLicanseData = uiImage.jpegData(compressionQuality: 0.5)
+            profile = uiImage
         }
 
         additionalParams = [
@@ -548,6 +511,7 @@ extension EditProfileView {
         
         let dispatchGroup = DispatchGroup()
         dispatchGroup.enter()
+        
         if let userLocation = userLocation {
             Utilities.getAddress(for: userLocation) { address in
                 additionalParams["address"] = address
@@ -555,17 +519,103 @@ extension EditProfileView {
             }
         }
 
+        let id = settings.id ?? ""
+
+        var uploadedProfileUrl: String?
+
         dispatchGroup.notify(queue: .main) {
-            viewModel.updateUserDataWithImage(imageData: imageData, carFrontImageData: imageCarFrontData, carBackImageData: imageCarBackData, carRightImageData: imageCarRightData, carLeftImageData: imageCarLeftData, carIDImageData: imageIDData, carLicenseImageData: imageLicanseData, additionalParams: additionalParams) { hasCar, message in
-                if !hasCar {
-                    showMessage(message: LocalizedStringKey.successfullyUpdated, icon: .logo)
+            if hasCar {
+                var carImagesToUpload: [UIImage?] = [mediaPickerViewModel.selectedCarFrontImage, mediaPickerViewModel.selectedCarBackImage, mediaPickerViewModel.selectedCarRightImage, mediaPickerViewModel.selectedCarLeftImage, mediaPickerViewModel.selectedIDImage, mediaPickerViewModel.selectedLicanseImage]
+
+                // Check if all images are selected
+                let allImagesSelected = carImagesToUpload.allSatisfy { $0 != nil }
+
+                if !allImagesSelected {
+                    viewModel.handleAPIError(.customError(message: "يجب عليك رفع كل الصور الخاصة بالسيارة"))
+                    return
+                }
+
+                // Remove nil elements from carImagesToUpload array
+                carImagesToUpload = carImagesToUpload.compactMap { $0 }
+
+                FirestoreService.shared.uploadMultipleImages(images: carImagesToUpload, id: id) { (urls, success) in
+                    if let urls = urls, success {
+                        additionalParams["carFrontImage"] = urls[0]
+                        additionalParams["carBackImage"] = urls[1]
+                        additionalParams["carRightImage"] = urls[2]
+                        additionalParams["carLeftImage"] = urls[3]
+                        additionalParams["identityImage"] = urls[4]
+                        additionalParams["licenseImage"] = urls[5]
+                    } else {
+                        viewModel.handleAPIError(.customError(message: "Failed to upload car images."))
+                        return
+                    }
+
+                    // Update user data
+                    if let profile = profile {
+                        FirestoreService.shared.uploadImageWithThumbnail(image: profile, id: id, imageName: "profile") { (url, success) in
+                            if success, let url = url {
+                                uploadedProfileUrl = url
+                                additionalParams["image"] = url
+                            } else {
+                                viewModel.handleAPIError(.customError(message: "Failed to upload profile image."))
+                                return
+                            }
+
+                            viewModel.updateUserDataWithImage(additionalParams: additionalParams) { hasCar, message in
+                                if !hasCar {
+                                    showMessage(message: LocalizedStringKey.successfullyUpdated, icon: .logo)
+                                } else {
+                                    showMessage(message: LocalizedStringKey.reviewFromAdmin, icon: .warning)
+                                }
+                            }
+                        }
+                    } else {
+                        // Update user data without profile image
+                        viewModel.updateUserDataWithImage(additionalParams: additionalParams) { hasCar, message in
+                            if !hasCar {
+                                showMessage(message: LocalizedStringKey.successfullyUpdated, icon: .logo)
+                            } else {
+                                showMessage(message: LocalizedStringKey.reviewFromAdmin, icon: .warning)
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Update user data without car images
+                if let profile = profile {
+                    FirestoreService.shared.uploadImageWithThumbnail(image: profile, id: id, imageName: "profile") { (url, success) in
+                        if success, let url = url {
+                            uploadedProfileUrl = url
+                            additionalParams["image"] = url
+                        } else {
+                            viewModel.handleAPIError(.customError(message: "Failed to upload profile image."))
+                            return
+                        }
+
+                        // Update user data
+                        viewModel.updateUserDataWithImage(additionalParams: additionalParams) { hasCar, message in
+                            if !hasCar {
+                                showMessage(message: LocalizedStringKey.successfullyUpdated, icon: .logo)
+                            } else {
+                                showMessage(message: LocalizedStringKey.reviewFromAdmin, icon: .warning)
+                            }
+                        }
+                    }
                 } else {
-                    showMessage(message: LocalizedStringKey.reviewFromAdmin, icon: .warning)
+                    // Update user data without profile image and car images
+                    viewModel.updateUserDataWithImage(additionalParams: additionalParams) { hasCar, message in
+                        if !hasCar {
+                            showMessage(message: LocalizedStringKey.successfullyUpdated, icon: .logo)
+                        } else {
+                            showMessage(message: LocalizedStringKey.reviewFromAdmin, icon: .warning)
+                        }
+                    }
                 }
             }
         }
     }
-    
+
     private func showMessage(message: String, icon: IconType) {
         let alertModel = AlertModel(
             iconType: icon,

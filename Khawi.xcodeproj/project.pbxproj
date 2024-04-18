@@ -198,6 +198,8 @@
 		1EF6ADE32AE70C9F00E4427E /* TabBarIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF6ADE22AE70C9F00E4427E /* TabBarIcon.swift */; };
 		1EF6ADE52AE716A100E4427E /* PlusMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF6ADE42AE716A100E4427E /* PlusMenu.swift */; };
 		1EF6ADE72AE7227300E4427E /* MiddleButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF6ADE62AE7227300E4427E /* MiddleButtonView.swift */; };
+		1EF8C9982B7928B100DD2ED2 /* FirestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF8C9972B7928B100DD2ED2 /* FirestoreService.swift */; };
+		1EF8C99A2B79292A00DD2ED2 /* UIImage+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF8C9992B79292A00DD2ED2 /* UIImage+Extensions.swift */; };
 		1EFA50D82AFAAAB20034858A /* DeliveryAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFA50D72AFAAAB20034858A /* DeliveryAddress.swift */; };
 		1EFA50DC2AFABBE30034858A /* AlertModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFA50DB2AFABBE30034858A /* AlertModel.swift */; };
 		1EFCEE462AE83A9A001BF30D /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFCEE452AE83A9A001BF30D /* SearchBar.swift */; };
@@ -380,6 +382,8 @@
 		1EF6ADE22AE70C9F00E4427E /* TabBarIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarIcon.swift; sourceTree = "<group>"; };
 		1EF6ADE42AE716A100E4427E /* PlusMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlusMenu.swift; sourceTree = "<group>"; };
 		1EF6ADE62AE7227300E4427E /* MiddleButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiddleButtonView.swift; sourceTree = "<group>"; };
+		1EF8C9972B7928B100DD2ED2 /* FirestoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreService.swift; sourceTree = "<group>"; };
+		1EF8C9992B79292A00DD2ED2 /* UIImage+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extensions.swift"; sourceTree = "<group>"; };
 		1EFA50D72AFAAAB20034858A /* DeliveryAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryAddress.swift; sourceTree = "<group>"; };
 		1EFA50DB2AFABBE30034858A /* AlertModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertModel.swift; sourceTree = "<group>"; };
 		1EFCEE452AE83A9A001BF30D /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
@@ -641,6 +645,7 @@
 			children = (
 				1EED6B252AF7B0F500A1B61A /* APIEndpoint.swift */,
 				1EED6B272AF7B12D00A1B61A /* APIClient.swift */,
+				1EF8C9972B7928B100DD2ED2 /* FirestoreService.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -766,6 +771,7 @@
 				1EDFB33A2B0253CF00CD1163 /* DateFormattable+Extension.swift */,
 				1E88CE3A2B0623A1005540F9 /* NSNotification+Extensions.swift */,
 				1EECE3AA2B07CE79001898AB /* Bundle+Extensions.swift */,
+				1EF8C9992B79292A00DD2ED2 /* UIImage+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1156,6 +1162,7 @@
 				1EF6ADD02AE6ED7500E4427E /* MediaPickerViewModel.swift in Sources */,
 				1EA7D8CA2AED9D2E0077155E /* DriverJoiningRequestDetailsView.swift in Sources */,
 				1EEA1C732AE585070026F092 /* RegisterView.swift in Sources */,
+				1EF8C9982B7928B100DD2ED2 /* FirestoreService.swift in Sources */,
 				1EC966912AE1556A004AC852 /* KhawiApp.swift in Sources */,
 				1EBD36EE2AF9104800AE1915 /* ConstantItem.swift in Sources */,
 				1EB9B6BF2AEBEDF80032DC99 /* SuccessDeliveryOfferRequestView.swift in Sources */,
@@ -1252,6 +1259,7 @@
 				1EEA1CF22AE5BCBA0026F092 /* PersonalInfoView.swift in Sources */,
 				1EED6B262AF7B0F500A1B61A /* APIEndpoint.swift in Sources */,
 				1E88CE3B2B0623A1005540F9 /* NSNotification+Extensions.swift in Sources */,
+				1EF8C99A2B79292A00DD2ED2 /* UIImage+Extensions.swift in Sources */,
 				1EF6ADD72AE6F73500E4427E /* CustomTextField.swift in Sources */,
 				1E2EAD302AE9A71600E94804 /* NotificationsView.swift in Sources */,
 			);
@@ -1403,7 +1411,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"Khawi/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
@@ -1411,9 +1419,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Khawi/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Khawi will use camera to upload user photo";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Khawi tracks user location within the app to enable delivery and sharing features, ensuring convenience while prioritizing user privacy.";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Khawi tracks user location within the app to enable delivery and sharing features, ensuring convenience while prioritizing user privacy.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Khawi tracks user location within the app to enable delivery and sharing features, ensuring convenience while prioritizing user privacy.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Khawi will use photo library to upload user photo";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Khawi will use photo library to upload user photo";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -1426,11 +1434,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Fazaa.Khawi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Kh_Dist;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Kha_Dist;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1450,7 +1458,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"Khawi/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
@@ -1458,9 +1466,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Khawi/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Khawi will use camera to upload user photo";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Khawi uses location services to customize your app experience based on your current location. Your privacy is our priority, and we handle your location data with care to ensure a seamless and personalized experience";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Khawi tracks user location within the app to enable delivery and sharing features, ensuring convenience while prioritizing user privacy.";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Khawi tracks user location within the app to enable delivery and sharing features, ensuring convenience while prioritizing user privacy.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Khawi tracks user location within the app to enable delivery and sharing features, ensuring convenience while prioritizing user privacy.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Khawi will use photo library to upload user photo";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Khawi will use photo library to upload user photo";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -1473,11 +1481,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Fazaa.Khawi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Kh_Dist;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Kha_Dist;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
